@@ -19,3 +19,17 @@ export const initialState: AuthState = {
     loading: false,
     error: null,
   };
+
+export interface UserInfo {
+    firstname: string;
+    lastname: string;
+    biography: string;
+    email: string;
+    // role: enum ["contributor", "maintainer"];
+    website: string;
+    telegram: string;
+    profession: string;
+    twitter: string;
+    location: string;
+    company: string;
+  } 
