@@ -2,6 +2,10 @@ import { Dispatch, SetStateAction } from "react";
 import Input from "../Input";
 import TextArea from "../TextArea";
 import { Button } from "@/components/ui/button";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import formStyles from "./formStyles";
 
 interface ThirdScreenProps {
   firstIndex: number; // The current step index in the onboarding process
@@ -25,25 +29,31 @@ export const ThirdScreen: React.FC<ThirdScreenProps> = ({
   setFirstIndex,
 }) => {
 //   const [active, setActive] = useState<string | null>(null);
+const { user } = useSelector((state: RootState) => state.auth);
+const navigate = useNavigate()
 
   return (
-    <div className="w-[560px] mx-auto flex flex-col gap-5">
-      <div className="w-[400px]">
-        <h1 className="text-4xl font-medium mb-3">Complete Your Profile 1/4</h1>
-        <p className="text-[17px] leading-6">
-          Provide additional information to help maintainers better match you
-          with suitable projects.
-        </p>
+    <div className={formStyles.container}>
+      <div className={formStyles.headWrapper}> 
+          <h1 className={formStyles.title}>Complete Your Profile 1/4</h1>
+        <div className={formStyles.descWrapper}>
+          <p className={formStyles.desc}>
+            Provide additional information to help maintainers better match you
+            with suitable projects.
+          </p>
+          <button className={formStyles.skip} onClick={() => navigate("/dashboard")}>Skip</button>
+        </div>
+
       </div>
-      <div className="flex gap-4">
-        <Input title="First Name" placeholder="Enter your first name" />
-        <Input title="Last Name" placeholder="Enter your last name" />
+      <div className="flex gap-4 max-sm:flex-col max-sm:gap-7">
+        <Input title="First Name" placeholder="Enter your first name" value={user?.displayName?.split(" ")[0]} />
+        <Input title="Last Name" placeholder="Enter your last name" value={user?.displayName?.split(" ")[1]}/>
       </div>
 
       <TextArea title="Biography" placeholder="Tell us about yourself" />
       <Input title="Website" placeholder="Add a link to your website" />
 
-      <div className="flex gap-4">
+      <div className={formStyles.btnGroup}>
         <Button
           onClick={() => setFirstIndex(firstIndex - 1)}
           variant={"outline"}
@@ -56,7 +66,7 @@ export const ThirdScreen: React.FC<ThirdScreenProps> = ({
           variant={"secondary"}
           className="w-full p-6 rounded-full font-normal text-base"
         >
-          Continue
+          Next
         </Button>
       </div>
     </div>

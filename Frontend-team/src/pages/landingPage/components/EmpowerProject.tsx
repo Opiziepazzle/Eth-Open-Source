@@ -1,12 +1,11 @@
 import arrowLeftIcon from "../../../assets/icons/arrowLefttIcon.svg";
 import arrowRightIcon from "../../../assets/icons/arrowRightIcon.svg";
-import image1 from "../../../assets/images/frame0.png";
 import image2 from "../../../assets/images/frame1.png";
 import CustomBtn from "@/components/CustomBtn";
 import CustomText from "./CustomText";
 import diamond from "../../../assets/icons/diamond.png";
-import framem2 from "../../../assets/images/Framem22.svg";
 import framem3 from "../../../assets/images/Framem3.svg";
+import fmoile from "../../../assets/icons/mobileicon34.svg";
 import { useState } from "react";
 
 interface Category {
@@ -21,8 +20,8 @@ interface Category {
 const categories: Category[] = [
   {
     title: "Empower Your Project on Ethereum",
-    image: image1,
-    image2: framem2,
+    image: fmoile,
+    image2: fmoile,
     desc: "Build the future of dApps, DAOs, and digital assets on Ethereum with the support of Eth Open Source. Connect with skilled contributors—developers, designers, and community managers—to bring your vision to life on a secure, open-source blockchain. Join us to create resilient, impactful projects that shape the blockchain space.",
     tag: "Maintainers",
   },
@@ -69,25 +68,24 @@ export default function EmpowerProject() {
                 <span className="text-sm mb-5 font-normal py-2 px-4 border-border border rounded-3xl max-sm:text-sm max-sm:font-normal ">
                   {categories[index].tag}
                 </span>
-                <CustomText text={categories[index].title} style="font-medium text-5xl max-sm:mb-2 my-7 max-sm:text-2xl max-sm:font-medium max-sm:text-center" />
-                <p className="text-lg font-normal text-grayBlue max-sm:hidden">{categories[index].desc}</p>
-                <p className="sm:hidden text-grayBlue max-sm:text-[10px] max-sm:text-center">Build the future of dApps, DAOs, and digital assets on Ethereum with the support of Eth Open Source. </p>
+                <CustomText text={categories[index].title} style="font-medium text-5xl max-sm:mb-2 my-7 max-sm:text-[32px]  max-sm:font-medium max-sm:text-start" />
+                <p className="text-lg font-normal text-grayBlue max-sm:text-base max-sm:mt-3 ">{categories[index].desc}</p>
               </div>
-              <div className="md:w-[50%]">
-                <img src={categories[index].image} alt={categories[index].title} className="w-full max-sm:hidden" />
-                <img src={categories[index].image2} alt={categories[index].title} className="w-full sm:hidden" />
+              <div className="md:w-[50%] max-sm:w-full max-sm:mt-7">
+                <img src={categories[index].image} alt={categories[index].title} className="w-full " />
+                {/* <img src={categories[index].image2} alt={categories[index].title} className="w-full sm:hidden" /> */}
               </div>
             </div>
             <div
               className={`flex my-7 max-sm:my-0 relative ${
-                index % 2 !== 0 ? "justify-end max-sm:justify-center" : "justify-start max-sm:justify-center"
+                index % 2 !== 0 ? "justify-end " : "justify-start "
               }`}
             >
               <CustomBtn
                 text=""
                 colored="yes"
                 icon={index % 2 === 0 ? arrowLeftIcon : arrowRightIcon}
-                style="w-[72px] h-[72px] max-sm:w-12 max-sm:h-12 max-sm:absolute max-sm:-top-[110px]"
+                style="w-[72px] h-[72px] max-sm:w-[72px] max-sm:h-[72px]"
                 onClick={index % 2 === 0 ? handlePrev : handleNext}
               />
             </div>

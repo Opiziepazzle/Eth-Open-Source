@@ -1,15 +1,15 @@
-import {  Dispatch, SetStateAction, useState } from "react";
+import { useEffect, useState } from "react";
 // import { OnboardingButton } from "../..";
 import { Button } from "@/components/ui/button";
 import personIcon from "../../../../assets/icons/person.svg"
 import maintainerIcon from "../../../../assets/icons/maintainer.svg"
 import { OnboardingButton } from "../OnboardingCTAButton";
-interface FirstScreenProps {
-  firstIndex: number; // The current index for navigation
-  setFirstIndex: Dispatch<SetStateAction<number>>; // Function to update the index
-  // personIcon: ReactNode; // Icon for the "Contributor" option
-  // maintainerIcon: ReactNode; // Icon for the "Maintainer" option
-}
+import { RootState, useAppDispatch } from "@/store";
+import { useSelector } from "react-redux";
+import { loginWithGitHub } from "@/store/actions/auth";
+import { FirstScreenProps } from "../types";
+import formStyles from "./formStyles";
+
 
 /**
  * FirstScreen component.
@@ -22,18 +22,28 @@ interface FirstScreenProps {
  * @param {FirstScreenProps} props The component props
  * @returns {JSX.Element} The component JSX
  */
+
+
 export const FirstScreen: React.FC<FirstScreenProps> = ({
   firstIndex,
   setFirstIndex,
-  // personIcon,
-  // maintainerIcon,
 }) => {
   const [active, setActive] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const { user } = useSelector((state: RootState) => state.auth);
+  console.log(user)
+  useEffect(() => {
+    if (user) {
+      setFirstIndex(firstIndex + 1);
+    }
+  }, [user])
+
+  
   return (
-    <div className="w-[560px] mx-auto flex flex-col gap-7">
-      <div className="w-[400px]">
-        <h1 className="text-4xl font-medium mb-3">Set up your profile</h1>
-        <p className="text-[17px] leading-6">
+    <div className={formStyles.container}>
+      <div className={formStyles.headWrapper}>
+        <h1 className={formStyles.title}>Set up your profile</h1>
+        <p className={formStyles.desc}>
           To get started, help us understand your main reason for joining Eth
           Open Source
         </p>
@@ -42,7 +52,8 @@ export const FirstScreen: React.FC<FirstScreenProps> = ({
         <OnboardingButton
           icon={personIcon}
           active={active}
-          onClick={() => setActive("contributor")}
+          size="big"
+          onClick={() => {setActive("contributor"); dispatch(loginWithGitHub())}}
           name="contributor"
           title="Sign up as a Contributor"
           desc="Create a portfolio to discover open source projects, join amazing ethereum ecosystems and help them grow."
@@ -50,7 +61,8 @@ export const FirstScreen: React.FC<FirstScreenProps> = ({
         <OnboardingButton
           icon={maintainerIcon}
           active={active}
-          onClick={() => setActive("maintainer")}
+          size="big"
+          onClick={() => {setActive("maintainer"); dispatch(loginWithGitHub())}}
           name="maintainer"
           title="Sign up as a Maintainer"
           desc="Create and maintain open source ethereum projects and find qualified contributors to join your team."
@@ -60,9 +72,10 @@ export const FirstScreen: React.FC<FirstScreenProps> = ({
         <Button
           onClick={() => setFirstIndex(firstIndex + 1)}
           variant={"secondary"}
+          disabled={user === null}
           className="w-full p-6 rounded-full font-normal text-base"
         >
-          Continue
+          Next
         </Button>
       </div>
     </div>

@@ -55,14 +55,14 @@ const projects: Project[] = [
 export default function FeaturedProjects() {
   return (
     <section className="mx-auto max-w-7xl px-4 pt-16 relative">
-      <div className="sm:border sm:border-blue-900 rounded-3xl p-3 pt-0 sm:p-11 sm:pt-0 backdrop-blur-md relative overflow-hidden">
+      <div className="border border-blue-900 rounded-3xl p-3 pt-0 sm:p-11 sm:pt-0 backdrop-blur-md relative overflow-hidden max-sm:py-5">
         {/* Background Grid */}
-        <div className="max-sm:hidden absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
         {/* Header Section */}
         <div className="text-center">
-          <img src={featureIcon} alt="Featured Projects Icon" className="mx-auto mb-6 max-sm:w-24 " />
-          <CustomText text="Featured Projects" style="text-5xl font-bold mb-10 max-sm:text-2xl"/>
+          <img src={featureIcon} alt="Featured Projects Icon" className="mx-auto mb-6 max-sm:w-28" />
+          <CustomText text="Featured Projects" style="text-5xl font-bold mb-10 max-sm:text-[32px]"/>
           {/* <h2 className="text-5xl font-bold mb-10">Featured Projects</h2> */}
         </div>
 
@@ -74,7 +74,7 @@ export default function FeaturedProjects() {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid gap-6 md:grid-cols-3 max-sm:grid-cols-2 max-sm:gap-3">
+        <div className="grid gap-6 md:grid-cols-3 max-sm:grid-cols-1 max-sm:gap-3">
           {projects.map((project, index) => (
             <div
               key={project.title}

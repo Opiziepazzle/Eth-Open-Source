@@ -12,7 +12,7 @@ export default function Navigation() {
   return (
     <Navbar className="fixed w-full z-50 bg-opacity-90 dark:bg-opacity-5 backdrop-blur-sm py-6 px-5 m-0">
       <Navbar.Brand href="/">
-        <img src="/EthOpenSource.svg" alt="logo" className='w-28 md:w-44'/>
+        <img src="/EthOpenSource.svg" alt="logo" className='w-48 md:w-44'/>
       </Navbar.Brand>
       <div className="flex md:order-2 gap-2">
         <CustomBtn text={`Login with Github`} colored="yes" style="hidden md:flex" onClick={() => {navigate("/onboarding")}}/>

@@ -33,3 +33,18 @@ export interface UserInfo {
     location: string;
     company: string;
   } 
+
+  export interface IOnboardUserState {
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    role: "Contributor" | "Maintainer";
+    photoURL: string;
+    bio: string;
+    website: string;
+    profession: "Tech" | "Non-Tech";
+    expertise: "Beginner" | "Intermediate" | "Expert";
+    skills: string[]; // New field for skills
+  }
+  

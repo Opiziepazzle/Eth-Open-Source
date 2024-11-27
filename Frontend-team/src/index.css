@@ -101,3 +101,25 @@
 .animate-float-slow {
   animation: float float-slow  20s linear infinite;
 }
+.gloomy-tag--container{
+  width: 100% !important;
+  outline: none !important;
+  border: none !important;
+  padding: 0;
+}
+.gloomy-tag--container:hover{
+  width: 100% !important;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.gloomy-tag--container{
+  padding: 0 !important;
+}
+.gloomy-tag--tag{
+  font-size: 14px !important;
+  color: #111927 !important;
+  font-weight: 400 !important;
+  padding: 8px !important;
+  background-color: #F2F4F7 !important;
+}

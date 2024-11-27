@@ -1,4 +1,4 @@
-import React from 'react'
+// import React from 'react'
 import diamond from "../../../assets/icons/diamond.png"
 import diamondIcon from "../../../assets/icons/eth.svg"
 import star from "../../../assets/images/rsz_stars.png"

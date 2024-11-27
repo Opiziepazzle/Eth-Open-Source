@@ -3,11 +3,9 @@ import teamIcon from "../../../assets/icons/teamIcon.svg";
 import diamonIcon from "../../../assets/icons/diamondIcon.svg";
 import fastIcon from "../../../assets/icons/fastIcon.svg";
 import womanLaptop from "../../../assets/images/womanLaptop.png";
-import womanLaptMobile from "../../../assets/images/image20.png"
-import womanLaptopMobile from "../../../assets/images/Framem1.svg"
+
 import CustomText from "./CustomText";
 import diamond from "../../../assets/icons/diamond.png"
-import { useState } from "react";
 
 /**
  * WhyChooseUs component.
@@ -22,7 +20,7 @@ import { useState } from "react";
 
 export default function WhyChooseUs() {
 
-  const [index, setIndex] = useState(0)
+  // const [index, setIndex] = useState(0)
 
   const benefits = [
     {
@@ -46,31 +44,34 @@ export default function WhyChooseUs() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 ">
-      <div className="max-sm:hidden grid gap-8 md:grid-cols-2 items-center relative backdrop-blur-md">
+      <div className=" grid gap-8 md:grid-cols-2 items-center relative backdrop-blur-md">
 
-        <div className=""><img src={womanLaptop} alt="" className="max-w-[787px] w-full" /></div>
+        <div className="max-sm:hidden"><img src={womanLaptop} alt="" className="max-w-[787px] w-full " /></div>
         <div className="">
           <div className=" ">
-            <CustomText style={"text-3xl mb-8 font-bold leading-tight md:text-5xl"} text="Why Choose Us" />
+            <CustomText style={"text-[32px] mb-8 font-bold leading-tight md:text-5xl max-sm:text-start max-sm:font-medium"} text="Why Choose Us" />
             <div className="">
               {benefits.map((benefit, id) => (
-                <div className="flex mb-5 items-start gap-5" key={id}>
-                  <img src={benefit.icon} alt="" className="w-14" />
+                <div className="flex mb-5 max-sm:mb-7 items-start gap-5 max-sm:flex-col" key={id}>
+                  <img src={benefit.icon} alt="" className="w-14 max-sm:w[52px]" />
                   <div className="">
-                    <h3 className="text-2xl mb-2">{benefit.title}</h3>
-                    <p className="text-grayBlue text-lg">{benefit.description}</p>
+                    <h3 className="text-2xl mb-2 max-sm:text-xl max-sm:font-normal">{benefit.title}</h3>
+                    <p className="text-grayBlue text-lg max-sm:text-base ">{benefit.description}</p>
                   </div>
                 </div>
               ))}
             </div>
 
           </div>
+        <div className="sm:hidden"><img src={womanLaptop} alt="" className="mt-24 w-full " /></div>
+
         </div>
         <div className="absolute top-0  right-10 -z-10">
           <img src={diamond} alt="" className=" w-56 blur-lg animate-float-slow" />
         </div>
       </div>
-      <div className="flex flex-col items-center sm:hidden">
+
+      {/* <div className="flex flex-col items-center sm:hidden">
         <CustomText style={"text-3xl mb-8 font-bold leading-tight md:text-5xl max-sm:text-2xl max-sm:font-medium"} text="Why Choose Us" />
         <div className="flex relative border border-border rounded-3xl p-3 max-sm:py-9  ">
           <div className="flex-1 ml-3">{benefits.map((benefit, id) => (
@@ -91,7 +92,7 @@ export default function WhyChooseUs() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }
