@@ -12,7 +12,11 @@ export default function Navigation() {
   return (
     <Navbar className="fixed w-full z-50 bg-opacity-90 dark:bg-opacity-5 backdrop-blur-sm py-6 px-5 m-0">
       <Navbar.Brand href="/">
+<<<<<<< HEAD
         <img src="/EthOpenSource.svg" alt="logo" className='w-28 md:w-44'/>
+=======
+        <img src="/EthOpenSource.svg" alt="logo" className='w-48 md:w-44'/>
+>>>>>>> origin/johnsdanlami
       </Navbar.Brand>
       <div className="flex md:order-2 gap-2">
         <CustomBtn text={`Login with Github`} colored="yes" style="hidden md:flex" onClick={() => {navigate("/onboarding")}}/>
@@ -56,6 +60,24 @@ export default function Navigation() {
         </div>
         <div
           className={`${
+<<<<<<< HEAD
+=======
+            activeLink === 'Projects' ? 'border-[#293056] border rounded-full p-2' : 'p-2'
+          }`}
+        >
+          <Link
+            to="/learn"
+            onClick={() => setActiveLink('Learn')}
+            className={`${
+              activeLink === 'Learn' ? ' bg-gray-800 rounded-3xl' : ''
+            }`}
+          >
+            Learn
+          </Link>
+        </div>
+        <div
+          className={`${
+>>>>>>> origin/johnsdanlami
             activeLink === 'Contributors' ? 'border-[#293056] border rounded-full p-2' : 'p-2'
           }`}
         >

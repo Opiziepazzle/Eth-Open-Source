@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import {store} from "../"
+=======
+import {store} from ".."
+>>>>>>> origin/johnsdanlami
 export interface ICounter {
     value: number;
 }
@@ -18,4 +22,37 @@ export const initialState: AuthState = {
     user: null,
     loading: false,
     error: null,
+<<<<<<< HEAD
   };
+=======
+  };
+
+export interface UserInfo {
+    firstname: string;
+    lastname: string;
+    biography: string;
+    email: string;
+    // role: enum ["contributor", "maintainer"];
+    website: string;
+    telegram: string;
+    profession: string;
+    twitter: string;
+    location: string;
+    company: string;
+  } 
+
+  export interface IOnboardUserState {
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    role: "Contributor" | "Maintainer";
+    photoURL: string;
+    bio: string;
+    website: string;
+    profession: "Tech" | "Non-Tech";
+    expertise: "Beginner" | "Intermediate" | "Expert";
+    skills: string[]; // New field for skills
+  }
+  
+>>>>>>> origin/johnsdanlami

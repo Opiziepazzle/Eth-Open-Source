@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import CardItem from "./components/CardItem";
 
 import DashboardComponent from "./components/Dashboard";
@@ -11,4 +12,14 @@ export default function Dashboard() {
       <Setup />
     </div>
   );
+=======
+// import React from 'react'
+
+export default function Dashboard() {
+  return (
+    <div>
+      Dashboard
+    </div>
+  )
+>>>>>>> origin/johnsdanlami
 }
