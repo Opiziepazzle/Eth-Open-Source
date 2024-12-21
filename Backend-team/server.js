@@ -114,8 +114,10 @@ app.get('/home', (req, res) => {
 
 // Profile Route (Displays user's details)
 app.get('/profile', (req, res) => {
+  console.log('User authenticated:', req.isAuthenticated());
+  console.log('User details:', req.user);
   if (!req.isAuthenticated()) {
-    return res.redirect('/login');
+    return res.redirect('/home');
   }
 
   res.send(`
@@ -125,15 +127,18 @@ app.get('/profile', (req, res) => {
   `);
 });
 
+
 // Logout Route
-app.get('/logout', (req, res) => {
+app.get('/logout', (req, res, next) => {
   req.logout((err) => {
     if (err) {
+      console.error('Logout error:', err);
       return next(err);
     }
-    res.redirect('/login');
+    res.redirect('/home');
   });
 });
+
   
   
   app.listen(PORT, () => {
