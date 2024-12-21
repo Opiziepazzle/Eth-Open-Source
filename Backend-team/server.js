@@ -74,7 +74,7 @@ app.use('/maintainer', maintainerRoutes)
 app.use('/', skillRoutes)
 app.use('/',
   googleRoutes, 
-  githubRoutes
+  //githubRoutes
   )
 
 
