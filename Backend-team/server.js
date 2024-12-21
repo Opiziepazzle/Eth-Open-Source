@@ -103,7 +103,7 @@ app.use((req, res, next) =>{
 
   
   // Home Route (Login page)
-app.get('/', (req, res) => {
+app.get('/home', (req, res) => {
   res.send(`
     <h1>Server is running!</h1>
     <a href="/auth/google/">
