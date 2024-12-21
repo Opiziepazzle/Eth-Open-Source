@@ -49,38 +49,7 @@ router.get(
   }
 );
 
-// Home Route (Login page)
-router.get('/', (req, res) => {
-  res.send(`
-    <h1>Server is running!</h1>
-    <a href="/auth/google/">
-      <button>Login with Google</button>
-    </a>
-  `);
-});
 
-// Profile Route (Displays user's details)
-router.get('/profile', (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/login');
-  }
-
-  res.send(`
-    <h1>Hello, ${req.user.displayName || req.user.username}!</h1>
-    <p>Email: ${req.user.email || 'No email provided'}</p>
-    <a href="/logout">Logout</a>
-  `);
-});
-
-// Logout Route
-router.get('/logout', (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect('/login');
-  });
-});
 
 
 module.exports = router;
