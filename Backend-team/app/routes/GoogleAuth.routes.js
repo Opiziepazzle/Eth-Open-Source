@@ -45,7 +45,7 @@ router.get(
     }
 
     // Successful authentication, redirect to profile
-    res.redirect('/profile');
+    res.redirect('/home');
   }
 );
 
