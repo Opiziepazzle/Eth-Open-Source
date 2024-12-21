@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const contributorSchema = new mongoose.Schema({
     contributorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Link to the user
-    profilePics: { type: String }, 
     firstName: { type: String },
     lastName: { type: String },
     phoneNumber: { type: String, required: true, unique: true },

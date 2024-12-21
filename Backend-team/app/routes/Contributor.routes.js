@@ -35,146 +35,37 @@ const upload = multer({
 
 
 
-// // Signup Route
-// router.post('/signup',
-//   (req, res, next) => {
-//     // Check if the role is contributor or maintainer and apply validation rules accordingly
-//     if (req.body.role === 'contributor') {
-//       return [contributorValidationRules(), validate, upload.single('profilePics')];
-//     } else if (req.body.role === 'maintainer') {
-//       return [maintainerValidationRules(), validate, upload.single('profilePics')];
-//     } else {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid role. Please choose either 'contributor' or 'maintainer'."
-//       });
-//     }
-//   },
-//   async (req, res) => {
-//     const { firstName, lastName, phoneNumber, location, biography, portfolioLink, identify, preferredSkills, goals, proficiencyLevel, termsAccepted, role } = req.body;
 
-//     // Set the correct ID based on the role
-//     let userId;
-//     if (role === 'contributor') {
-//       userId = req.user._id; // Use userId for contributor
-//     } else if (role === 'maintainer') {
-//       userId = req.user._id; // Use userId for maintainer (or a different logic if needed)
-//     }
+router.patch('/update-contributor', contributorValidationRules(), validate, (req, res) => {
+  const {
+    firstName, lastName, phoneNumber, location,
+    biography, portfolioLink, identify, preferredSkills, goals, proficiencyLevel, termsAccepted
+  } = req.body;
 
-//     const profilePics = req.file ? req.file.path : undefined;
+  // Set contributorId from the authenticated user
+  const contributorId = req.user._id; // Assuming user info is attached to the request after authentication
 
-//     // Validate required fields
-//     if (!userId || !firstName || !lastName || !location || !identify || !termsAccepted || !role) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Missing required fields"
-//       });
-//     }
+  // Validate required fields
+  if (!contributorId || !firstName || !lastName || !location || !identify || !termsAccepted) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing required fields: contributorId, firstName, lastName, location, identify, termsAccepted"
+    });
+  }
 
-//     const skillCategory = identify === 'Tech Bro' ? 'Tech' : 'Non-Tech';
+  // Fetch skills based on identity selection (Tech Bro or Non Tech Bro)
+  const skillCategory = identify === 'Tech Bro' ? 'Tech' : 'Non-Tech';
 
-//     // Fetch skills based on identity selection (Tech Bro or Non Tech Bro)
-//     try {
-//       const skills = await skillSchema.find({ category: skillCategory });
+  skillSchema.find({ category: skillCategory })
+    .then(skills => {
+      // Map skill IDs to preferredSkills (if provided)
+      const skillIds = skills.map(skill => skill._id);
+      const newPreferredSkills = preferredSkills ? [...preferredSkills, ...skillIds] : skillIds;
 
-//       // Map skill IDs to preferredSkills (if provided)
-//       const skillIds = skills.map(skill => skill._id);
-//       const newPreferredSkills = preferredSkills ? [...preferredSkills, ...skillIds] : skillIds;
-
-//       let user;
-
-//       if (role === 'contributor') {
-//         user = new contributorSchema({
-//           contributorId: userId, // Use contributorId for contributor role
-//           profilePics,
-//           firstName,
-//           lastName,
-//           phoneNumber,
-//           location,
-//           biography,
-//           portfolioLink,
-//           identify,
-//           termsAccepted,
-//           termsAcceptedAt: new Date(),
-//           preferredSkills: newPreferredSkills,
-//           goals,
-//           proficiencyLevel
-//         });
-//       } else if (role === 'maintainer') {
-//         user = new maintainerSchema({
-//           maintainerId: userId, // Use maintainerId for maintainer role
-//           profilePics,
-//           firstName,
-//           lastName,
-//           phoneNumber,
-//           location,
-//           biography,
-//           portfolioLink,
-//           identify,
-//           termsAccepted,
-//           termsAcceptedAt: new Date(),
-//           preferredSkills: newPreferredSkills,
-//           goals,
-//           proficiencyLevel
-//         });
-//       }
-
-//       // Save the user data to the appropriate schema
-//       await user.save();
-
-//       res.status(201).json({
-//         success: true,
-//         message: `${role.charAt(0).toUpperCase() + role.slice(1)} created successfully`,
-//         data: user
-//       });
-
-//     } catch (err) {
-//       res.status(400).json({
-//         success: false,
-//         message: "Error processing the signup",
-//         error: err.message
-//       });
-//     }
-//   }
-// );
-
-
-
-
-//Sign up
-
-router.post('/signup', contributorValidationRules(), validate, upload.single('profilePics'), (req, res) => {
-    const {
-      firstName, lastName, phoneNumber, location,
-      biography, portfolioLink, identify, preferredSkills, goals, proficiencyLevel, termsAccepted
-    } = req.body;
-  
-    // Set contributorId from the authenticated user
-    const contributorId = req.user._id; // Assuming user info is attached to the request after authentication
-  
-    const profilePics = req.file ? req.file.path : undefined;
-  
-    // Validate required fields
-    if (!contributorId || !firstName || !lastName || !location || !identify ||  !termsAccepted) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required fields: contributorId, firstName, lastName, location, identify, termsAccepted"
-      });
-    }
-  
-    // Fetch skills based on identity selection (Tech Bro or Non Tech Bro)
-    const skillCategory = identify === 'Tech Bro' ? 'Tech' : 'Non-Tech';
-  
-    skillSchema.find({ category: skillCategory })
-      .then(skills => {
-        // Map skill IDs to preferredSkills (if provided)
-        const skillIds = skills.map(skill => skill._id);
-        const newPreferredSkills = preferredSkills ? [...preferredSkills, ...skillIds] : skillIds;
-  
-        // Construct contributor object
-        const contributor = new contributorSchema({
-          contributorId,
-          profilePics,
+      // Find and update the contributor
+      contributorSchema.findOneAndUpdate(
+        { contributorId }, // Filter condition
+        {
           firstName,
           lastName,
           phoneNumber,
@@ -184,43 +75,227 @@ router.post('/signup', contributorValidationRules(), validate, upload.single('pr
           identify,
           termsAccepted,
           termsAcceptedAt: new Date(),
-          preferredSkills: newPreferredSkills, // Assigning the skills here
+          preferredSkills: newPreferredSkills, // Assigning the updated skills here
           goals,
           proficiencyLevel
-        });
-  
-        // Save contributor to the database
-        contributor.save()
-          .then(newContributor => {
-            res.status(201).json({
-              success: true,
-              message: "Contributor created successfully",
-              data: newContributor
-            });
-          })
-          .catch(err => {
-            res.status(400).json({
-              success: false,
-              message: "Error creating contributor",
-              error: err.message
-            });
+        },
+        { new: true, runValidators: true } // Return the updated document and run validators
+      )
+      .then(updatedContributor => {
+        if (!updatedContributor) {
+          return res.status(404).json({
+            success: false,
+            message: "Contributor not found"
           });
+        }
+
+        res.status(200).json({
+          success: true,
+          message: "Contributor updated successfully",
+          data: updatedContributor
+        });
       })
       .catch(err => {
         res.status(400).json({
           success: false,
-          message: "Error fetching skills",
+          message: "Error updating contributor",
           error: err.message
         });
       });
-  });
+    })
+    .catch(err => {
+      res.status(400).json({
+        success: false,
+        message: "Error fetching skills",
+        error: err.message
+      });
+    });
+});
 
 
+
+// //Sign up
+
+// router.post('/signup', contributorValidationRules(), validate, (req, res) => {
+//     const {
+//       firstName, lastName, phoneNumber, location,
+//       biography, portfolioLink, identify, preferredSkills, goals, proficiencyLevel, termsAccepted
+//     } = req.body;
+  
+//     // Set contributorId from the authenticated user
+//     const contributorId = req.user._id; // Assuming user info is attached to the request after authentication
+  
+//     // Validate required fields
+//     if (!contributorId || !firstName || !lastName || !location || !identify ||  !termsAccepted) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Missing required fields: contributorId, firstName, lastName, location, identify, termsAccepted"
+//       });
+//     }
+  
+//     // Fetch skills based on identity selection (Tech Bro or Non Tech Bro)
+//     const skillCategory = identify === 'Tech Bro' ? 'Tech' : 'Non-Tech';
+  
+//     skillSchema.find({ category: skillCategory })
+//       .then(skills => {
+//         // Map skill IDs to preferredSkills (if provided)
+//         const skillIds = skills.map(skill => skill._id);
+//         const newPreferredSkills = preferredSkills ? [...preferredSkills, ...skillIds] : skillIds;
+  
+//         // Construct contributor object
+//         const contributor = new contributorSchema({
+//           contributorId,
+//           firstName,
+//           lastName,
+//           phoneNumber,
+//           location,
+//           biography,
+//           portfolioLink,
+//           identify,
+//           termsAccepted,
+//           termsAcceptedAt: new Date(),
+//           preferredSkills: newPreferredSkills, // Assigning the skills here
+//           goals,
+//           proficiencyLevel
+//         });
+  
+//         // Save contributor to the database
+//         contributor.save()
+//           .then(newContributor => {
+//             res.status(201).json({
+//               success: true,
+//               message: "Contributor created successfully",
+//               data: newContributor
+//             });
+//           })
+//           .catch(err => {
+//             res.status(400).json({
+//               success: false,
+//               message: "Error creating contributor",
+//               error: err.message
+//             });
+//           });
+//       })
+//       .catch(err => {
+//         res.status(400).json({
+//           success: false,
+//           message: "Error fetching skills",
+//           error: err.message
+//         });
+//       });
+//   });
+
+
+
+// // Filter and search for contributors (pagination)
+
+// router.get('/contributors', (req, res) => {
+//   const { skills, proficiencyLevel, location, searchTerm, page, limit } = req.query;
+//   let filters = {};
+
+//   // Apply filters if provided (exact matches)
+//   if (skills) filters.preferredSkills = { $in: skills.split(',') };  // Match preferred skills
+//   if (proficiencyLevel) filters.proficiencyLevel = proficiencyLevel;  // Match proficiency level
+//   if (location) filters.location = location;  // Match location
+
+//   // Apply search functionality (e.g., search term for names, skills, etc.)
+//   if (searchTerm) {
+//     filters.$or = [
+//       { firstName: { $regex: searchTerm, $options: 'i' } },  // Search within firstName (case-insensitive)
+//       { lastName: { $regex: searchTerm, $options: 'i' } },   // Search within lastName (case-insensitive)
+//       { skills: { $regex: searchTerm, $options: 'i' } }      // Search within skills (case-insensitive)
+//     ];
+//   }
+
+//   // Pagination settings: defaults to page=1 and limit=10
+//   const pageNumber = parseInt(page) || 1;
+//   const pageLimit = parseInt(limit) || 10;
+//   const skip = (pageNumber - 1) * pageLimit;  // Calculate how many documents to skip
+
+//   // Perform the search, filter, and pagination
+//   contributorSchema
+//     .find(filters)  // Apply filter and search
+//     .skip(skip)  // Skip results based on pagination
+//     .limit(pageLimit)  // Limit results based on pagination
+//     .then((contributors) => {
+//       contributorSchema.countDocuments(filters).then((total) => {  // Get the total count for pagination
+//         res.status(200).json({
+//           success: true,
+//           data: contributors,  // Return the filtered and paginated data
+//           pagination: {
+//             currentPage: pageNumber,  // Current page
+//             totalPages: Math.ceil(total / pageLimit),  // Total number of pages
+//             totalContributors: total,  // Total number of contributors
+//           },
+//         });
+//       });
+//     })
+//     .catch((err) => {
+//       res.status(500).json({
+//         success: false,
+//         message: 'Error fetching contributors',
+//         error: err.message,  // If something goes wrong
+//       });
+//     });
+// });
+
+
+
+
+// Filter for contributors 
+
+// router.get('/contributors', (req, res) => {
+//   const { skills, proficiencyLevel, location } = req.query;
+//   let filters = {};
+
+//   if (skills) filters.preferredSkills = { $in: skills.split(',') };
+//   if (proficiencyLevel) filters.proficiencyLevel = proficiencyLevel;
+//   if (location) filters.location = location;
+
+//   contributorSchema.find(filters)
+//     .then((contributors) => res.status(200).json(contributors))
+//     .catch((err) => res.status(500).json({ error: err.message }));
+// });
 
   
+// // GET route to fetch all contributors with pagination
+// router.get('/contributors', (req, res) => {
 
+//   // Extract pagination parameters from query (defaults: page=1, limit=10)
+//   const page = parseInt(req.query.page) || 1;
+//   const limit = parseInt(req.query.limit) || 10;
 
-  
+//   // Calculate the skip value
+//   const skip = (page - 1) * limit;
+
+//   // Fetch maintainers with pagination
+//   contributorSchema
+//     .find()
+//     .populate('contributorId', 'email')
+//     .skip(skip)
+//     .limit(limit)
+//     .then((contributors) => {
+//       // Get the total count of contributors for pagination metadata
+//       contributorSchema.countDocuments().then((total) => {
+//         res.status(200).json({
+//           success: true,
+//           data: contributors,
+//           pagination: {
+//             currentPage: page,
+//             totalPages: Math.ceil(total / limit),
+//             totalContributors: total,
+//           },
+//         });
+//       });
+//     })
+//     .catch((err) => {
+//       res.status(500).json({
+//         success: false,
+//         message: 'Error fetching contributors',
+//         error: err.message,
+//       });
+//     });
+// });
 
 
   

@@ -101,6 +101,25 @@ const contributorValidationRules = () => {
 };
 
 
+
+const maintainerValidationRules = () => {
+    return [
+        // Maintainer ID validation (e.g., check if it exists and is a valid format)
+        check('maintainerId')
+            .notEmpty().withMessage('Maintainer ID is required')
+            .isAlphanumeric().withMessage('Maintainer ID must be alphanumeric'),
+            
+            // Terms Accepted validation (Required and must be true)
+        check('termsAccepted')
+        .notEmpty().withMessage('Acceptance of terms and conditions is required')
+        .isBoolean().withMessage('Terms accepted must be a boolean value')
+        .equals('true').withMessage('You must accept the terms and conditions to proceed'),
+
+
+    ];
+};
+
+
 // General validation middleware to check for validation errors
 const validate = (req, res, next) => {
     const errors = validationResult(req);
@@ -114,5 +133,6 @@ module.exports = {
     signupValidationRules,
     loginValidationRules,
     contributorValidationRules,
+    maintainerValidationRules,
     validate,
 };

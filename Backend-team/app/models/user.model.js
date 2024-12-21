@@ -1,92 +1,80 @@
-const mongoose = require("mongoose");
-const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 
-
-
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    unique: true,
-    required: true
-  },
-
-
-  password: {
-    type: String,
-    //required: true
-  },
-
-  username: {
-    type: String,
-    //unique: true,
-    //required: true
-  },
-
-  avatar: {
-    type: String,
-    
-  },
-
-  identity: {
-    type: String,
-    enum: ['Tech Bro', 'Non-Tech Bro'], // New field for tech identity
-    required: true
-  },
-
-
-
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
-
-  verificationToken: String,
-  verificationTokenExpires: Date,
-
-
-  resetOTP: {
-    type: String
-  },
-
-  resetOTPExpires: {
-    type: Date
-  },
-
-  discordId: { type: String, required: true, unique: true, },
-  discriminator: { type: String, required: true },
-
-
-
-  googleId: { type: String, required: false },
-  displayName: { type: String, required: false },
-  firstName: { type: String, required: false },
-  lastName: { type: String, required: false },
-  image: { type: String, required: false},
-
-
-  githubId: { type: String, sparse: true, unique: true }, // GitHub-specific field
-  provider: { type: String, default: 'local' }, // Can store 'github' for GitHub accounts
-
-
-},
-
-
-
+const userSchema = new mongoose.Schema(
   {
-    timestamps: true
+    email: {
+      type: String,
+      unique: true,
+      required: function () {
+        return !this.githubId; // Email is required only if there's no GitHub ID
+      },
+    },
+
+    password: {
+      type: String,
+      // required: true (Commented out for GitHub OAuth users)
+    },
+
+    username:{ type: String, 
+      unique: false
+     },
+
+    avatar: {
+      type: String,
+    },
+
+    identity: {
+      type: String,
+      enum: ['Tech Bro', 'Non-Tech Bro'], // Field for tech identity
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
 
 
+    verificationToken: String,
+    verificationTokenExpires: Date,
 
+    resetOTP: String,
+    resetOTPExpires: Date,
 
+    discordId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
 
+    discriminator: {
+      type: String,
+    },
+
+    googleId: {
+      type: String,
+      sparse: true,
+    },
+
+    displayName: String,
+    firstName: String,
+    lastName: String,
+    image: String,
+
+    githubId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    accessToken: String, // To store the GitHub access token
+    provider: {
+      type: String,
+      default: 'local', // 'github' for GitHub accounts
+    },
+  },
+  {
+    timestamps: true,
   }
-
-
 );
-
-
-
-
-
 
 module.exports = mongoose.model('User', userSchema);
