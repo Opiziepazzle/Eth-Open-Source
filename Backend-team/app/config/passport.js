@@ -11,7 +11,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/auth/google/callback',
+      callbackURL: 'https://ethopensource.onrender.com/auth/google/callback',
       scope: ['email'],
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -85,7 +85,7 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/auth/github/callback',
+      callbackURL: 'https://ethopensource.onrender.com/auth/github/callback',
       scope: ['user:email']  
     },
     async (accessToken, refreshToken, profile, done) => {
