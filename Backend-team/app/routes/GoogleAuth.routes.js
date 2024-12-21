@@ -50,7 +50,7 @@ router.get(
 );
 
 // Home Route (Login page)
-router.get('/gle', (req, res) => {
+router.get('/', (req, res) => {
   res.send(`
     <h1>Server is running!</h1>
     <a href="/auth/google/">
