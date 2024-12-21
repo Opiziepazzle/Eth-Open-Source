@@ -18,7 +18,8 @@ router.post("/signup", signupValidationRules(), validate, UserController.SignUp 
 //login user
 router.post("/login", 
     loginValidationRules(),
-    validate, UserController.Login)
+    validate, 
+    UserController.Login)
 
 
 

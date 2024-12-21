@@ -10,11 +10,13 @@ const bodyParser  = require('body-parser')
 const userRoutes = require('./app/routes/User.routes')
 const verificationRoutes = require('./app/routes/Verification.routes')
 const contributorRoutes = require('./app/routes/Contributor.routes')
+const maintainerRoutes = require('./app/routes/Maintainer.routes')
 const skillRoutes = require('./app/routes/Skill.routes')
 const googleRoutes = require('./app/routes/GoogleAuth.routes')
 const githubRoutes = require('./app/routes/GitHubAuth.routes')
 const passport = require('passport');
 const ErrorHandler = require('./app/middleware/ErrorHandler.middleware');
+
 const session = require('express-session');
 
  require('./app/database/Mongo.database')
@@ -68,8 +70,12 @@ app.use(cookieParser());
  //Routes which should handle request
 app.use('/user', userRoutes, verificationRoutes)
 app.use('/contributor', contributorRoutes)
-app.use('/skills', skillRoutes)
-app.use('/auth', googleRoutes, githubRoutes)
+app.use('/maintainer', maintainerRoutes)
+app.use('/', skillRoutes)
+app.use('/',
+  googleRoutes, 
+  githubRoutes
+  )
 
 
 
