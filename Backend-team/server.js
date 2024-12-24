@@ -11,7 +11,6 @@ const userRoutes = require('./app/routes/User.routes')
 const verificationRoutes = require('./app/routes/Verification.routes')
 const contributorRoutes = require('./app/routes/Contributor.routes')
 const maintainerRoutes = require('./app/routes/Maintainer.routes')
-const skillRoutes = require('./app/routes/Skill.routes')
 const googleRoutes = require('./app/routes/GoogleAuth.routes')
 const githubRoutes = require('./app/routes/GitHubAuth.routes')
 const passport = require('passport');
@@ -32,7 +31,8 @@ require('./app/config/passport');        //(passport);
  app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: { secure: false } // If using HTTPS, set `secure: true`
   }));
   
   app.use(passport.initialize());
@@ -68,14 +68,12 @@ app.use(cookieParser());
 
 
  //Routes which should handle request
-app.use('/user', userRoutes, verificationRoutes)
+app.use('/user', userRoutes)
+app.use('/verify', verificationRoutes)
 app.use('/contributor', contributorRoutes)
 app.use('/maintainer', maintainerRoutes)
-app.use('/', skillRoutes)
-app.use('/',
-  googleRoutes, 
-  githubRoutes
-  )
+app.use('/auth/google', googleRoutes )
+app.use('/auth/github', githubRoutes )
 
 
 

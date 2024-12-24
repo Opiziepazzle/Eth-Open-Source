@@ -5,9 +5,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
-      required: function () {
-        return !this.githubId; // Email is required only if there's no GitHub ID
-      },
+      
     },
 
     password: {
@@ -16,7 +14,8 @@ const userSchema = new mongoose.Schema(
     },
 
     username:{ type: String, 
-      unique: false
+     // required: false
+     unique: true, sparse: true 
      },
 
     avatar: {
@@ -50,10 +49,7 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
 
-    googleId: {
-      type: String,
-      sparse: true,
-    },
+    googleId: { type: String, unique: true, sparse: true },
 
     displayName: String,
     firstName: String,
@@ -76,5 +72,12 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+
+
+// Virtual field to expose `id` instead of `_id`
+userSchema.virtual('id').get(function() {
+  return this._id.toString(); // Convert _id to a string
+});
 
 module.exports = mongoose.model('User', userSchema);

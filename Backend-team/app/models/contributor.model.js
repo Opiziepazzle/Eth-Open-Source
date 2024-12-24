@@ -5,11 +5,11 @@ const contributorSchema = new mongoose.Schema({
     firstName: { type: String },
     lastName: { type: String },
     phoneNumber: { type: String, required: true, unique: true },
-    location: { type: String, enum: ['Country1', 'Country2', 'Country3'], required: true },
+    location: { type: [String], enum: ['Country1', 'Country2', 'Country3'], required: true }, // Allow multiple locations
     biography: { type: String, maxlength: 1000 },
     portfolioLink:  { type: String, match: /^https?:\/\/[\w.-]+\.[a-z]{2,}/i },
     identify: { type: String, enum: ['Tech Bro', 'Non Tech Bro'], required: true },
-    preferredSkills: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Skill' }], // Related to skills schema
+    preferredSkills: [ 'JavaScript', 'Graphic Design', 'Public Speaking' ],
     goals: [{
         type: String,
         enum: ['Become Full Stack Developer', 'Learn Mobile Development',

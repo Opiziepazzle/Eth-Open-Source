@@ -2,6 +2,7 @@ const userSchema = require("../models/user.model");
 const mongoose = require("mongoose");
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken"); 
 require('dotenv').config();
 

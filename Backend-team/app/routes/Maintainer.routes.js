@@ -9,9 +9,9 @@ const {  maintainerValidationRules, validate } = require('../utils/Validator.uti
 
 
 
-//Sign up
+//Maintainer Onboarding
 
-router.post('/signup',  maintainerValidationRules(), validate,  (req, res) => {
+router.post('/update-maintainer', checkAuth, maintainerValidationRules(), validate,  (req, res) => {
    
     // Extract user ID and termsAccepted from the request
     const maintainerId = req.user._id; // Assuming user info is attached to req.user after authentication
@@ -56,44 +56,5 @@ router.post('/signup',  maintainerValidationRules(), validate,  (req, res) => {
 );
 
 
-// GET route to fetch all maintainers with pagination
-router.get('/list', (req, res) => {
-  // Extract pagination parameters from query (defaults: page=1, limit=10)
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
 
-  // Calculate the skip value
-  const skip = (page - 1) * limit;
-
-  // Fetch maintainers with pagination
-  maintainerSchema
-    .find()
-    .populate('maintainerId', 'email') 
-    .skip(skip)
-    .limit(limit)
-    .then((maintainers) => {
-      // Get the total count of maintainers for pagination metadata
-      maintainerSchema.countDocuments().then((total) => {
-        res.status(200).json({
-          success: true,
-          data: maintainers,
-          pagination: {
-            currentPage: page,
-            totalPages: Math.ceil(total / limit),
-            totalMaintainers: total,
-          },
-        });
-      });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        success: false,
-        message: 'Error fetching maintainers',
-        error: err.message,
-      });
-    });
-});
-
-
-  
 module.exports = router;

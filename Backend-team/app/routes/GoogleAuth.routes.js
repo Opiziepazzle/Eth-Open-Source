@@ -4,83 +4,94 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 
-// Route for Google authentication
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// // Route for Google authentication
+router.get('/', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// // Route for Google callback
+
+
+// Route for Google callback
 // router.get(
-//   '/auth/google/callback',
-//   passport.authenticate('google', { session: false, failureRedirect: '/login' }),
-//   (req, res) => {
-//     // Create JWT token for the authenticated user
- //   const token = jwt.sign({ userId: req.user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
-
-//     // Send the token to the frontend
-//     res.json({
-//       message: 'Google authentication successful',
-//       token: token,
-//       user: req.user // You can also send user data if needed
-//     });
-//   }
-// );
+//     '/callback',
+//     passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+//     (req, res) => {
+//       // Create JWT token for the authenticated user
+//       const token = jwt.sign({ userId: req.user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
+  
+//       // Redirect to frontend with token as a query parameter
+//       // Redirect to the frontend with the token as part of the URL
+//     const redirectUrl = `http://localhost:3000/learn-section?token=${token}`;
+//     res.redirect(redirectUrl);
+//     }
+//   );
 
 
 
 
-
-
-
-// Google Callback Route
-// Google OAuth callback route
+//  // Google OAuth callback route
 router.get(
-  '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),  // Corrected to 'google' instead of 'github'
+  '/callback',
+  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
   (req, res) => {
-    console.log('User after Google Authentication:', req.user);
+    try {
+      console.log('User after Google Authentication:', req.user);
 
-    // Ensure the user has an email from Google
-    if (!req.user || !req.user.email) {
-      console.error('Google user does not have an email. Redirecting to login.');
-      return res.redirect('/login?error=no-email');
+      // Ensure the user has an email from Google
+      if (!req.user || !req.user.email) {
+        console.error('Google user does not have an email. Redirecting to login.');
+        return res.redirect('/login?error=no-email');
+      }
+
+      // Ensure the JWT_KEY is correctly set
+      if (!process.env.JWT_KEY) {
+        console.error('JWT_KEY not set in environment');
+        return res.status(500).json({
+          error: {
+            message: 'Internal server error: JWT_KEY not set.',
+            details: null,
+          },
+        });
+      }
+
+      // Create JWT token for the authenticated user
+      let token = jwt.sign({ userId: req.user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
+
+      // Send the token and user info as JSON response
+      res.json({
+        message: 'Google authentication successful',
+        token: token,
+        user: req.user, // You can also send user data if needed
+      });
+    } catch (error) {
+      console.error('Error during Google authentication callback:', error);
+      res.status(500).json({
+        error: {
+          message: 'Internal server error',
+          details: error.message,
+        },
+      });
     }
-
-    // Successful authentication, redirect to profile
-    res.redirect('/profile');
   }
 );
 
 // Home Route (Login page)
-router.get('/gle', (req, res) => {
+router.get('/home', (req, res) => {
   res.send(`
     <h1>Server is running!</h1>
-    <a href="/auth/google/">
+    <a href="/auth/google">
       <button>Login with Google</button>
     </a>
   `);
 });
 
-// Profile Route (Displays user's details)
-router.get('/profile', (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/login');
-  }
 
-  res.send(`
-    <h1>Hello, ${req.user.displayName || req.user.username}!</h1>
-    <p>Email: ${req.user.email || 'No email provided'}</p>
-    <a href="/logout">Logout</a>
-  `);
-});
 
-// Logout Route
-router.get('/logout', (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect('/login');
-  });
-});
+
+
+
+
+
+
+
 
 
 module.exports = router;

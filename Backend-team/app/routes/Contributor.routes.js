@@ -1,193 +1,97 @@
 const express = require('express');
 const router = express.Router();
 const contributorSchema = require('../models/contributor.model'); 
-const skillSchema = require('../models/skills.model');
+const userSchema = require('../models/user.model'); 
 const multer = require('multer');
+const mongoose = require('mongoose')
 const bodyParser = require('body-parser');
 const twilio = require('twilio');
 const rateLimit = require('express-rate-limit'); //For high-security applications, combine this with IP-based rate limiting 
 const checkAuth = require("../middleware/App.middleware"); 
+const jwt = require('jsonwebtoken');
 const { contributorValidationRules, validate } = require('../utils/Validator.util');
 
-// Multer setup for file upload
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, './uploads');
-  },
-  filename: function(req, file, cb) {
-    cb(null, Date.now() + file.originalname);
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-    cb(null, true);
-  } else {
-    cb(null, false); // Reject non-image files
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 },
-  fileFilter: fileFilter
-});
 
 
 
-
-router.patch('/update-contributor', contributorValidationRules(), validate, (req, res) => {
+router.patch('/update-contributor', checkAuth, contributorValidationRules(), validate, (req, res) => {
   const {
-    firstName, lastName, phoneNumber, location,
-    biography, portfolioLink, identify, preferredSkills, goals, proficiencyLevel, termsAccepted
+    firstName,
+    lastName,
+    phoneNumber,
+    location,
+    biography,
+    portfolioLink,
+    identify,
+    preferredSkills,
+    goals,
+    proficiencyLevel,
+    termsAccepted,
   } = req.body;
 
-  // Set contributorId from the authenticated user
-  const contributorId = req.user._id; // Assuming user info is attached to the request after authentication
+  const contributorId = req.user._id;
 
-  // Validate required fields
-  if (!contributorId || !firstName || !lastName || !location || !identify || !termsAccepted) {
+  // Check if contributorId is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(contributorId)) {
     return res.status(400).json({
       success: false,
-      message: "Missing required fields: contributorId, firstName, lastName, location, identify, termsAccepted"
+      message: 'Invalid contributorId format',
     });
   }
 
-  // Fetch skills based on identity selection (Tech Bro or Non Tech Bro)
-  const skillCategory = identify === 'Tech Bro' ? 'Tech' : 'Non-Tech';
+  // Validate required fields
+  if (!firstName || !lastName || !location || !identify || !termsAccepted) {
+    return res.status(400).json({
+      success: false,
+      message: 'Missing required fields: firstName, lastName, location, identify, termsAccepted',
+    });
+  }
 
-  skillSchema.find({ category: skillCategory })
-    .then(skills => {
-      // Map skill IDs to preferredSkills (if provided)
-      const skillIds = skills.map(skill => skill._id);
-      const newPreferredSkills = preferredSkills ? [...preferredSkills, ...skillIds] : skillIds;
+  // Prepare update data
+  const updateData = {
+    firstName,
+    lastName,
+    phoneNumber,
+    location,
+    biography,
+    portfolioLink,
+    identify,
+    termsAccepted,
+    termsAcceptedAt: new Date(),
+    preferredSkills,
+    goals,
+    proficiencyLevel,
+  };
 
-      // Find and update the contributor
-      contributorSchema.findOneAndUpdate(
-        { contributorId }, // Filter condition
-        {
-          firstName,
-          lastName,
-          phoneNumber,
-          location,
-          biography,
-          portfolioLink,
-          identify,
-          termsAccepted,
-          termsAcceptedAt: new Date(),
-          preferredSkills: newPreferredSkills, // Assigning the updated skills here
-          goals,
-          proficiencyLevel
-        },
-        { new: true, runValidators: true } // Return the updated document and run validators
-      )
-      .then(updatedContributor => {
-        if (!updatedContributor) {
-          return res.status(404).json({
-            success: false,
-            message: "Contributor not found"
-          });
-        }
-
-        res.status(200).json({
-          success: true,
-          message: "Contributor updated successfully",
-          data: updatedContributor
-        });
-      })
-      .catch(err => {
-        res.status(400).json({
-          success: false,
-          message: "Error updating contributor",
-          error: err.message
-        });
+  // Use upsert to create or update contributor
+  contributorSchema.findOneAndUpdate(
+    { _id: contributorId },
+    { $set: updateData },
+    { new: true, upsert: true, runValidators: true }
+  )
+    .then((updatedContributor) => {
+      res.status(200).json({
+        success: true,
+        message: updatedContributor.isNew
+          ? 'Contributor created successfully'
+          : 'Contributor updated successfully',
+        data: updatedContributor,
       });
     })
-    .catch(err => {
+    .catch((err) => {
+      console.error('Error during upsert operation:', err);
       res.status(400).json({
         success: false,
-        message: "Error fetching skills",
-        error: err.message
+        message: 'Error updating or creating contributor',
+        error: err.message,
       });
     });
 });
 
 
 
-// //Sign up
 
-// router.post('/signup', contributorValidationRules(), validate, (req, res) => {
-//     const {
-//       firstName, lastName, phoneNumber, location,
-//       biography, portfolioLink, identify, preferredSkills, goals, proficiencyLevel, termsAccepted
-//     } = req.body;
-  
-//     // Set contributorId from the authenticated user
-//     const contributorId = req.user._id; // Assuming user info is attached to the request after authentication
-  
-//     // Validate required fields
-//     if (!contributorId || !firstName || !lastName || !location || !identify ||  !termsAccepted) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Missing required fields: contributorId, firstName, lastName, location, identify, termsAccepted"
-//       });
-//     }
-  
-//     // Fetch skills based on identity selection (Tech Bro or Non Tech Bro)
-//     const skillCategory = identify === 'Tech Bro' ? 'Tech' : 'Non-Tech';
-  
-//     skillSchema.find({ category: skillCategory })
-//       .then(skills => {
-//         // Map skill IDs to preferredSkills (if provided)
-//         const skillIds = skills.map(skill => skill._id);
-//         const newPreferredSkills = preferredSkills ? [...preferredSkills, ...skillIds] : skillIds;
-  
-//         // Construct contributor object
-//         const contributor = new contributorSchema({
-//           contributorId,
-//           firstName,
-//           lastName,
-//           phoneNumber,
-//           location,
-//           biography,
-//           portfolioLink,
-//           identify,
-//           termsAccepted,
-//           termsAcceptedAt: new Date(),
-//           preferredSkills: newPreferredSkills, // Assigning the skills here
-//           goals,
-//           proficiencyLevel
-//         });
-  
-//         // Save contributor to the database
-//         contributor.save()
-//           .then(newContributor => {
-//             res.status(201).json({
-//               success: true,
-//               message: "Contributor created successfully",
-//               data: newContributor
-//             });
-//           })
-//           .catch(err => {
-//             res.status(400).json({
-//               success: false,
-//               message: "Error creating contributor",
-//               error: err.message
-//             });
-//           });
-//       })
-//       .catch(err => {
-//         res.status(400).json({
-//           success: false,
-//           message: "Error fetching skills",
-//           error: err.message
-//         });
-//       });
-//   });
-
-
-
-// // Filter and search for contributors (pagination)
+//  Filter and search for contributors (pagination)
 
 // router.get('/contributors', (req, res) => {
 //   const { skills, proficiencyLevel, location, searchTerm, page, limit } = req.query;
