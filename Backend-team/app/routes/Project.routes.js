@@ -5,7 +5,7 @@ const projectSchema = require('../models/project.model');
 
 
 // Create a project
-router.post('/', checkAuth, (req, res) => {
+router.post('/create-project', checkAuth, (req, res) => {
   const { title, description, type, rewards, experienceLevel, skillsRequired } = req.body;
 
   projectSchema.create({
@@ -24,7 +24,7 @@ router.post('/', checkAuth, (req, res) => {
 
 
 // Get all projects with optional filters and sorting
-router.get('/', (req, res) => {
+router.get('/project-matching', (req, res) => {
   const { status, type, experienceLevel, sortBy, rewardOrder } = req.query;
   let filters = {};
   let sortOptions = {};

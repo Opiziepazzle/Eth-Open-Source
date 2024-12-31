@@ -79,7 +79,7 @@ exports.VerifyEmail =  (req, res) => {
       })
       .then(user => {
         // Send email logic here (use your nodemailer configuration)
-        const verificationLink = `http://localhost:3000/verify/verify-email?token=${user.verificationToken}`;
+        const verificationLink = `https://ethopensource.onrender.com/verify/verify-email?token=${user.verificationToken}`;
         res.status(200).json({
           message: "Verification email sent successfully"
         });
