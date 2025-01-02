@@ -46,7 +46,7 @@ router.get(
        const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
 
        // Redirect to frontend with token and role
-       const frontendURL = `https://gitethproject.netlify.app/onboarding?token=${token}&role=${role}`;
+       const frontendURL = `http://localhost:5173/onboarding?token=${token}&role=`;
        res.redirect(frontendURL);
 
 
