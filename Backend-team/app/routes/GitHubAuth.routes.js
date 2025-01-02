@@ -50,12 +50,6 @@ router.get(
        res.redirect(frontendURL);
 
 
-      // Respond with token, repos, and role
-      res.json({
-        token,
-        repos,
-        role
-      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Authentication failed' });
