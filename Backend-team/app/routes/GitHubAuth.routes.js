@@ -42,11 +42,14 @@ router.get(
       // Generate JWT token
       const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
 
+       // Send response with token, repositories, and role
+       const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
+
       // Respond with token, repos, and role
       res.json({
         token,
         repos,
-        role: contributor ? 'contributor' : maintainer ? 'maintainer' : 'none',
+        role
       });
     } catch (err) {
       console.error(err);
