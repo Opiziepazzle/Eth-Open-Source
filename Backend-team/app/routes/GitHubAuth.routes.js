@@ -35,6 +35,11 @@ router.get(
         user = await userSchema.create({ githubId: req.user.githubId });
       }
 
+      //Store the repositories fetched from github
+      user.repos = repos;
+      await user.save();
+
+
       // Check roles
       const contributor = await contributorSchema.findOne({ contributorId: user._id });
       const maintainer = await maintainerSchema.findOne({ maintainerId: user._id });

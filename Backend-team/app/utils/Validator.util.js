@@ -118,6 +118,43 @@ const maintainerValidationRules = () => {
    
     ];
   };
+
+
+
+  const projectValidationRules = () => {
+    return [
+      // Title validation
+      check('title')
+        .notEmpty().withMessage('Title is required')
+        .isString().withMessage('Title must be a string')
+        .isLength({ max: 100 }).withMessage('Title must not exceed 100 characters'),
+  
+      // Description validation
+      check('description')
+        .notEmpty().withMessage('Description is required')
+        .isString().withMessage('Description must be a string')
+        .isLength({ max: 2000 }).withMessage('Description must not exceed 2000 characters'),
+  
+      // Type validation
+      check('type')
+        .notEmpty().withMessage('Project type is required')
+        .isIn(['Volunteer', 'Funded']).withMessage('Type must be either "Volunteer" or "Funded"'),
+  
+      // Rewards validation
+      check('rewards')
+        .optional()
+        .isString().withMessage('Rewards must be a string'),
+  
+      // Experience Level validation
+      check('experienceLevel')
+        .notEmpty().withMessage('Experience level is required')
+        .isIn(['Beginner', 'Intermediate', 'Expert']).withMessage('Experience level must be one of: Beginner, Intermediate, Expert'),
+  
+      
+  
+      
+    ];
+  };
   
 
 
@@ -135,5 +172,6 @@ module.exports = {
     loginValidationRules,
     contributorValidationRules,
     maintainerValidationRules,
+    projectValidationRules,
     validate,
 };

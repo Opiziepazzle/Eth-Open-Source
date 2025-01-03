@@ -33,7 +33,7 @@ passport.use(
           // Update the existing user with the Google ID
           user.googleId = profile.id;
           await user.save();
-          return done(null, user);
+          return done(null, { ...user.toObject(), accessToken });
         }
 
         // If no user exists with the same email, create a new user
@@ -44,7 +44,7 @@ passport.use(
         });
 
         const savedUser = await newUser.save();
-        return done(null, savedUser);
+        return done(null, { ...savedUser.toObject(), accessToken });
       } catch (err) {
         // Handle any errors
         return done(err, null);

@@ -1,13 +1,52 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const checkAuth = require('../middleware/App.middleware');
 const projectSchema = require('../models/project.model');
+const { projectValidationRules, validate } = require('../utils/Validator.util');
+
+
+
+const storage = multer.diskStorage({
+  
+  destination: function(req, file, cb ){
+    cb(null, './uploads');
+  },
+  filename: function(req, file, cb){
+    
+    cb(null, Date.now() + file.originalname)
+  }
+})
+
+const fileFilter = (req, file, cb)=>{
+  //reject a file
+  if(file.mimetype === 'image/jpeg'  || file.mimetype === 'image/png'){
+    cb(null, true);
+  }else
+  cb(null, false)
+  
+};
+
+const upload = multer({storage: storage, 
+  limits:{
+fileSize: 1024 * 1024 * 5
+},
+fileFilter: fileFilter })
+
+
 
 
 // Create a project
-router.post('/create-project', checkAuth, (req, res) => {
-  const { title, description, type, rewards, experienceLevel, skillsRequired } = req.body;
+router.post('/create-project', checkAuth,  projectValidationRules(), validate, upload.single('projectImage'), (req, res) => {
 
+
+  const { title, description, type, rewards, experienceLevel, skillsRequired } = req.body;
+  const projectImage = req.file ? req.file.path : undefined;
+
+ // Validate required fields
+ if (!title || !description || !type) {
+  return res.status(400).json({ error: 'Title, description, and type are required fields.' });
+ }
   projectSchema.create({
     title,
     description,
@@ -16,6 +55,7 @@ router.post('/create-project', checkAuth, (req, res) => {
     rewards,
     experienceLevel,
     skillsRequired,
+    projectImage
   })
     .then((project) => res.status(201).json(project))
     .catch((err) => res.status(500).json({ error: err.message }));
@@ -64,10 +104,10 @@ router.post('/:projectId/assign', checkAuth, (req, res) => {
 
   projectSchema.findByIdAndUpdate(
     projectId,
-    { $addToSet: { contributors: contributorId } }, // Add contributor if not already assigned
+    { $addToSet: { contributor: contributorId } }, // Add contributor if not already assigned
     { new: true }
   )
-    .populate('contributors')
+    .populate('contributor')
     .then((project) => res.status(200).json(project))
     .catch((err) => res.status(500).json({ error: err.message }));
 });

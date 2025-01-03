@@ -17,10 +17,9 @@ router.get(
       // Create JWT token for the authenticated user
       const token = jwt.sign({ userId: req.user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
   
-      // Redirect to frontend with token as a query parameter
-      // Redirect to the frontend with the token as part of the URL
-    const redirectUrl = `https://gitethproject.netlify.app/learn-section?token=${token}`;
-    res.redirect(redirectUrl);
+      
+    const frontendURL = `https://gitethproject.netlify.app/learn-section?token=${token}`;
+    res.redirect(frontendURL);
     }
   );
 

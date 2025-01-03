@@ -13,9 +13,15 @@ const userSchema = new mongoose.Schema(
       // required: true (Commented out for GitHub OAuth users)
     },
 
+    repos: {
+    type: Array, //This will store repo fetched from github 
+    default: []
+    },
+
     username:{ type: String, 
      // required: false
-     unique: true, sparse: true 
+     unique: true,
+     sparse: true 
      },
 
     avatar: {
