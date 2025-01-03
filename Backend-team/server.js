@@ -23,9 +23,6 @@ const session = require('express-session');
  require('dotenv').config();
 
 
-//making upload folder publicly available and then passing the middleware
-app.use('/uploads', express.static('uploads') )
-
  // Passport configuration
 require('./app/config/passport');        //(passport);
  
@@ -80,6 +77,11 @@ app.use(cookieParser());
   }
   next();
 })
+
+
+//making upload folder publicly available and then passing the middleware
+app.use('/uploads', express.static('uploads') )
+
 
 
 
