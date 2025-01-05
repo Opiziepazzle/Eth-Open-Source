@@ -14,12 +14,73 @@ router.get('/', passport.authenticate('github', { scope: ['user:email', 'repo', 
 
 
 
+// router.get(
+//   '/callback',
+//   passport.authenticate('github', { session: false }),
+//   async (req, res) => {
+//     try {
+//       const userId = req.user._id; // Authenticated user ID
+//       const accessToken = req.user.accessToken; // GitHub access token
+
+//       // Fetch user repositories from GitHub
+//       const response = await axios.get('https://api.github.com/user/repos', {
+//         headers: { Authorization: `Bearer ${accessToken}` },
+//       });
+
+//       const repos = response.data;
+
+//       // Check if user exists in the database
+//       let user = await userSchema.findById(userId);
+
+//       if (!user) {
+//         // New user: Create and redirect to onboarding
+//         user = new userSchema({
+//           githubId: req.user.githubId,
+//           repos, // Save fetched repos
+//         });
+
+//         await user.save();
+
+//         const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
+
+//         // Redirect to onboarding for role selection
+//         const onboardingURL = `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
+//         return res.redirect(onboardingURL);
+//       }
+
+//       // Existing user: Check role
+//       const contributor = await contributorSchema.findOne({ contributorId: user._id });
+//       const maintainer = await maintainerSchema.findOne({ maintainerId: user._id });
+
+//       const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
+
+//       // Generate token with role for existing users
+//       const token = jwt.sign({ userId: user._id, role }, process.env.JWT_KEY, { expiresIn: '1h' });
+
+//       // Redirect to appropriate dashboard or onboarding
+//       const redirectURL =
+//         role === 'maintainer'
+//           ? `http://localhost:5173/maintainer-dashboard?token=${encodeURIComponent(token)}`
+//           : role === 'contributor'
+//           ? `http://localhost:5173/contributor-dashboard?token=${encodeURIComponent(token)}`
+//           : `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
+
+//       return res.redirect(redirectURL);
+//     } catch (err) {
+//       console.error('Error during authentication:', err);
+//       res.status(500).json({ error: 'Authentication failed' });
+//     }
+//   }
+// );
+
+
+
 router.get(
   '/callback',
   passport.authenticate('github', { session: false }),
   async (req, res) => {
     try {
-      const userId = req.user._id; // Authenticated user ID
+      const userId = req.user._id; // Authenticated user ID from GitHub
       const accessToken = req.user.accessToken; // GitHub access token
 
       // Fetch user repositories from GitHub
@@ -30,7 +91,7 @@ router.get(
       const repos = response.data;
 
       // Check if user exists in the database
-      let user = await userSchema.findById(userId);
+      let user = await userSchema.findOne({ githubId: req.user.githubId });
 
       if (!user) {
         // New user: Create and redirect to onboarding
@@ -41,7 +102,8 @@ router.get(
 
         await user.save();
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
+        // Sign the token with githubId
+        const token = jwt.sign({ userId: user.githubId }, process.env.JWT_KEY, { expiresIn: '1h' });
 
         // Redirect to onboarding for role selection
         const onboardingURL = `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
@@ -55,7 +117,7 @@ router.get(
       const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
 
       // Generate token with role for existing users
-      const token = jwt.sign({ userId: user._id, role }, process.env.JWT_KEY, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user.githubId, role }, process.env.JWT_KEY, { expiresIn: '1h' });
 
       // Redirect to appropriate dashboard or onboarding
       const redirectURL =
@@ -72,6 +134,7 @@ router.get(
     }
   }
 );
+
 
 // Route to fetch GitHub user info (email, displayName, avatar)
 router.get('/user-info', checkAuth, async (req, res) => {

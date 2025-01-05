@@ -65,18 +65,20 @@ app.use(cookieParser());
 
 
  //Handling CORS Error
- app.use((req, res, next) =>{
-  res.header("Access-Control-Allow-Origin", "*");
+ app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*"); // Allow all origins (use specific domain in production)
   res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization "
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization" // Ensure Authorization is allowed
   );
-  if ( req.method === 'OPTIONS'){
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET')
-    return res.status(200).json({});
+
+  if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET'); // Allow these methods
+      return res.status(200).json({});
   }
+
   next();
-})
+});
 
 
 //making upload folder publicly available and then passing the middleware

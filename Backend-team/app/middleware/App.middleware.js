@@ -3,7 +3,7 @@ const userSchema = require('../models/user.model');
 
 module.exports = (req, res, next) => {
     // Extract token from cookies or authorization header
-    const token =  decodeURIComponent(req.query.token) || req.headers['authorization']?.split(' ')[1]; // Strip 'Bearer ' prefix
+    const token = decodeURIComponent(req.query.token).trim() || req.headers['authorization']?.split(' ')[1]; // Strip 'Bearer ' prefix
 
     if (!token) {
         return res.status(401).json({ message: 'Authentication failed: No token provided' });
