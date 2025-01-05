@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema(
 
     googleId: { type: String, unique: true, sparse: true },
 
-    displayName: String,
+    displayName: { type: String},
     firstName: String,
     lastName: String,
     image: String,
@@ -81,9 +81,9 @@ const userSchema = new mongoose.Schema(
 
 
 
-// Virtual field to expose `id` instead of `_id`
-userSchema.virtual('id').get(function() {
-  return this._id.toString(); // Convert _id to a string
-});
+// // Virtual field to expose `id` instead of `_id`
+// userSchema.virtual('id').get(function() {
+//   return this._id.toString(); // Convert _id to a string
+// });
 
 module.exports = mongoose.model('User', userSchema);

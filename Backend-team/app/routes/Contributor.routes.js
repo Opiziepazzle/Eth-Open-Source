@@ -89,6 +89,23 @@ router.patch('/update-contributor', checkAuth, contributorValidationRules(), val
 });
 
 
+// GET /api/contributors - Fetch all contributors
+router.get('/all-contributors', async (req, res) => {
+  try {
+    // Query to fetch all contributors
+    const contributors = await contributorSchema.find({}, 'firstName lastName email');
+    
+    if (!contributors.length) {
+      return res.status(404).json({ message: 'No contributors found' });
+    }
+
+    // Respond with contributors
+    res.status(200).json({ contributors });
+  } catch (error) {
+    console.error('Error fetching contributors:', error);
+    res.status(500).json({ error: 'An error occurred while fetching contributors' });
+  }
+});
 
 
 //  Filter and search for contributors (pagination)

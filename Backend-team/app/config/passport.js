@@ -105,6 +105,7 @@ passport.use(
           const newUser = new userSchema({
             githubId: profile.id,
             displayName: profile.displayName || profile.username || 'No Name',
+            avatar: profile._json.avatar_url,
             email: email, 
           });
   
@@ -136,13 +137,6 @@ passport.deserializeUser(async (userData, done) => {
     done(err, null);
   }
 });
-
-
-
-
-
-
-
 
 
 

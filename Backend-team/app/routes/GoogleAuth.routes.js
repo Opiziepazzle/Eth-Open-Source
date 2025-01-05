@@ -11,24 +11,30 @@ router.get('/', passport.authenticate('google', { scope: ['profile', 'email'] })
 
 // Route for Google callback
 router.get(
-    '/callback',
-    passport.authenticate('google', { session: false, failureRedirect: '/login' }),
-    (req, res) => {
-      // Create JWT token for the authenticated user
-      const token = jwt.sign({ userId: req.user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
-  
-      
+  '/callback',
+  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+  (req, res) => {
+    // Create JWT token for the authenticated user
+    const token = jwt.sign({ userId: req.user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
+
+
     const frontendURL = `https://gitethproject.netlify.app/learn-section?token=${token}`;
     res.redirect(frontendURL);
-    }
-  );
+  }
+);
+
+//Google Logout
+router.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect(`https://accounts.google.com/Logout`)
+
+})
 
 
 
 
-
- //Simple code for testing Google
- // Google OAuth callback route
+//Simple code for testing Google
+// Google OAuth callback route
 // router.get(
 //   '/callback',
 //   passport.authenticate('google', { session: false, failureRedirect: '/login' }),

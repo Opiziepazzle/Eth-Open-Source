@@ -3,7 +3,9 @@ const router = express.Router();
 const multer = require('multer');
 const checkAuth = require('../middleware/App.middleware');
 const projectSchema = require('../models/project.model');
-const { projectValidationRules, validate } = require('../utils/Validator.util');
+
+
+
 
 
 
@@ -37,10 +39,13 @@ fileFilter: fileFilter })
 
 
 // Create a project
-router.post('/create-project', checkAuth,  projectValidationRules(), validate, upload.single('projectImage'), (req, res) => {
+router.post('/create-project', checkAuth,   upload.single('projectImage'), (req, res) => {
 
 
-  const { title, description, type, rewards, experienceLevel, skillsRequired } = req.body;
+  const { title, description, type, rewards, 
+    experienceLevel, skillsRequired, projectLeads,
+    skillsCategory, longDescription, userLinks } = req.body;
+
   const projectImage = req.file ? req.file.path : undefined;
 
  // Validate required fields
@@ -55,11 +60,17 @@ router.post('/create-project', checkAuth,  projectValidationRules(), validate, u
     rewards,
     experienceLevel,
     skillsRequired,
-    projectImage
+    projectImage,
+    projectLeads,
+    skillsCategory, 
+    userLinks,
+    longDescription,
+    
   })
     .then((project) => res.status(201).json(project))
     .catch((err) => res.status(500).json({ error: err.message }));
 });
+
 
 
 

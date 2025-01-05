@@ -5,13 +5,15 @@ const axios = require('axios');
 const userSchema = require('../models/user.model');
 const contributorSchema = require('../models/contributor.model');
 const maintainerSchema = require('../models/maintainer.model');
-
+const checkAuth = require('../middleware/App.middleware')
 const router = express.Router();
 
 // GitHub Login Endpoint
 router.get('/', passport.authenticate('github', { scope: ['user:email', 'repo', 'issues'] }));
 
-// GitHub OAuth Callback
+
+
+
 router.get(
   '/callback',
   passport.authenticate('github', { session: false }),
@@ -31,38 +33,75 @@ router.get(
       let user = await userSchema.findById(userId);
 
       if (!user) {
-        // Create a new user if not found
-        user = await userSchema.create({ githubId: req.user.githubId });
+        // New user: Create and redirect to onboarding
+        user = new userSchema({
+          githubId: req.user.githubId,
+          repos, // Save fetched repos
+        });
+
+        await user.save();
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
+
+        // Redirect to onboarding for role selection
+        const onboardingURL = `http://localhost:5173/onboarding?token=${token}`;
+        return res.redirect(onboardingURL);
       }
 
-      //Store the repositories fetched from github
-      user.repos = repos;
-      await user.save();
-
-
-      // Check roles
+      // Existing user: Check role
       const contributor = await contributorSchema.findOne({ contributorId: user._id });
       const maintainer = await maintainerSchema.findOne({ maintainerId: user._id });
 
-      // Generate JWT token
-      const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
+      const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
 
-       // Send response with token, repositories, and role
-       const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
+      // Generate token with role for existing users
+      const token = jwt.sign({ id: user._id, role }, process.env.JWT_KEY, { expiresIn: '1h' });
 
-       // Redirect to frontend with token and role
-       const frontendURL = `http://localhost:5173/onboarding?token=${token}&role=`;
-       res.redirect(frontendURL);
+      // Redirect to appropriate dashboard or onboarding
+      const redirectURL =
+        role === 'maintainer'
+          ? `http://localhost:5173/maintainer-dashboard?token=${token}`
+          : role === 'contributor'
+          ? `http://localhost:5173/contributor-dashboard?token=${token}`
+          : `http://localhost:5173/onboarding?token=${token}`;
 
-
+      return res.redirect(redirectURL);
     } catch (err) {
-      console.error(err);
+      console.error('Error during authentication:', err);
       res.status(500).json({ error: 'Authentication failed' });
     }
   }
 );
 
+// Route to fetch GitHub user info (email, displayName, avatar)
+router.get('/user-info', checkAuth, async (req, res) => {
+  try {
+    // Find the user by GitHub ID (assuming it's stored in `githubId`)
+    const user = await userSchema.findOne({ githubId: req.user.githubId });
 
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Send back the required user information
+   // const { email, displayName, avatar } = user;
+   const { email, displayName = 'No Name', avatar = '' } = user;
+
+    // if (!displayName || !avatar) {
+    //   return res.status(200).json({ message: 'User info incomplete. Please complete your profile.' });
+    // }
+    // if (!user.displayName) {
+    //   user.displayName = profile.displayName || profile.username || 'No Name';  // Ensure displayName is set
+    // }
+    // if (!user.avatar) {
+    //   user.avatar = profile._json.avatar_url || '';  // Ensure avatar is set
+    // }
+    
+    return res.status(200).json({ email, displayName, avatar });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
 
 // Fetch Issues for a Repository
 router.get('/issues/:owner/:repo', async (req, res) => {
@@ -124,6 +163,12 @@ router.get('/pulls/:owner/:repo', async (req, res) => {
 
 
 
+//Github Logout
+router.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect(`https://frontend-domain`)
+
+})
 
 
 
