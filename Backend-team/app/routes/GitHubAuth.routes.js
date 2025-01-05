@@ -44,7 +44,7 @@ router.get(
         const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
 
         // Redirect to onboarding for role selection
-        const onboardingURL = `http://localhost:5173/onboarding?token=${token}`;
+        const onboardingURL = `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
         return res.redirect(onboardingURL);
       }
 
@@ -60,10 +60,10 @@ router.get(
       // Redirect to appropriate dashboard or onboarding
       const redirectURL =
         role === 'maintainer'
-          ? `http://localhost:5173/maintainer-dashboard?token=${token}`
+          ? `http://localhost:5173/maintainer-dashboard?token=${encodeURIComponent(token)}`
           : role === 'contributor'
-          ? `http://localhost:5173/contributor-dashboard?token=${token}`
-          : `http://localhost:5173/onboarding?token=${token}`;
+          ? `http://localhost:5173/contributor-dashboard?token=${encodeURIComponent(token)}`
+          : `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
 
       return res.redirect(redirectURL);
     } catch (err) {
