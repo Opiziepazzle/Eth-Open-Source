@@ -60,7 +60,7 @@ const contributorValidationRules = () => {
         check('biography')
             .trim()
             .optional()
-            .isLength({ max: 500 }).withMessage('Biography should not exceed 500 characters'),
+            .isLength({ max: 1000 }).withMessage('Biography should not exceed 1000 characters'),
 
         // Portfolio Link validation (Optional, URL format check)
         check('portfolioLink')
@@ -109,6 +109,46 @@ const maintainerValidationRules = () => {
         .notEmpty().withMessage('Maintainer ID is required')
         .isAlphanumeric().withMessage('Maintainer ID must be alphanumeric'),
   
+        // First Name validation
+        check('firstName')
+            .trim()
+            .notEmpty().withMessage('First name is required'),
+
+        // Last Name validation
+        check('lastName')
+            .trim()
+            .notEmpty().withMessage('Last name is required'),
+
+        // Phone number validation
+        check('phoneNumber')
+            .trim()
+            .notEmpty().withMessage('Phone number is required')
+            .isMobilePhone().withMessage('Enter a valid phone number')
+            .isLength({ min: 10, max: 15 }).withMessage('Phone number should be between 10 to 15 digits'),
+
+        // Location validation
+        check('location')
+            .trim()
+            .notEmpty().withMessage('Location is required'),
+
+        // Biography validation (Optional but recommended for length)
+        check('biography')
+            .trim()
+            .optional()
+            .isLength({ max: 1000 }).withMessage('Biography should not exceed 1000 characters'),
+
+        // Portfolio Link validation (Optional, URL format check)
+        check('portfolioLink')
+            .trim()
+            .optional()
+            .isURL().withMessage('Enter a valid URL for portfolio'),
+
+
+            // Biography validation (Optional but recommended for length)
+        check('typeOfContributor')
+        .trim()
+        .optional()
+        .isLength({ max: 1000 }).withMessage('Biography should not exceed 1000 characters'),
     
            // Terms Accepted validation (Required and must be true)
            check('termsAccepted')
@@ -121,40 +161,6 @@ const maintainerValidationRules = () => {
 
 
 
-  const projectValidationRules = () => {
-    return [
-      // Title validation
-      check('title')
-        .notEmpty().withMessage('Title is required')
-        .isString().withMessage('Title must be a string')
-        .isLength({ max: 100 }).withMessage('Title must not exceed 100 characters'),
-  
-      // Description validation
-      check('description')
-        .notEmpty().withMessage('Description is required')
-        .isString().withMessage('Description must be a string')
-        .isLength({ max: 2000 }).withMessage('Description must not exceed 2000 characters'),
-  
-      // Type validation
-      check('type')
-        .notEmpty().withMessage('Project type is required')
-        .isIn(['Volunteer', 'Funded']).withMessage('Type must be either "Volunteer" or "Funded"'),
-  
-      // Rewards validation
-      check('rewards')
-        .optional()
-        .isString().withMessage('Rewards must be a string'),
-  
-      // Experience Level validation
-      check('experienceLevel')
-        .notEmpty().withMessage('Experience level is required')
-        .isIn(['Beginner', 'Intermediate', 'Expert']).withMessage('Experience level must be one of: Beginner, Intermediate, Expert'),
-  
-      
-  
-      
-    ];
-  };
   
 
 
@@ -172,6 +178,5 @@ module.exports = {
     loginValidationRules,
     contributorValidationRules,
     maintainerValidationRules,
-    projectValidationRules,
     validate,
 };

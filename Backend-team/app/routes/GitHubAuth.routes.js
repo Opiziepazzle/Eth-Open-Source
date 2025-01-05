@@ -41,7 +41,7 @@ router.get(
 
         await user.save();
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
 
         // Redirect to onboarding for role selection
         const onboardingURL = `http://localhost:5173/onboarding?token=${token}`;
@@ -55,7 +55,7 @@ router.get(
       const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
 
       // Generate token with role for existing users
-      const token = jwt.sign({ id: user._id, role }, process.env.JWT_KEY, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user._id, role }, process.env.JWT_KEY, { expiresIn: '1h' });
 
       // Redirect to appropriate dashboard or onboarding
       const redirectURL =
