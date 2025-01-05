@@ -73,14 +73,12 @@ router.get('/', passport.authenticate('github', { scope: ['user:email', 'repo', 
 //   }
 // );
 
-
-
 router.get(
   '/callback',
   passport.authenticate('github', { session: false }),
   async (req, res) => {
     try {
-      const userId = req.user._id; // Authenticated user ID from GitHub
+      const githubId = req.user.id; // GitHub ID, this is the unique identifier
       const accessToken = req.user.accessToken; // GitHub access token
 
       // Fetch user repositories from GitHub
@@ -91,12 +89,12 @@ router.get(
       const repos = response.data;
 
       // Check if user exists in the database
-      let user = await userSchema.findOne({ githubId: req.user.githubId });
+      let user = await userSchema.findOne({ githubId: githubId });
 
       if (!user) {
         // New user: Create and redirect to onboarding
         user = new userSchema({
-          githubId: req.user.githubId,
+          githubId, // Use GitHub ID
           repos, // Save fetched repos
         });
 
@@ -134,6 +132,8 @@ router.get(
     }
   }
 );
+
+
 
 
 // Route to fetch GitHub user info (email, displayName, avatar)
