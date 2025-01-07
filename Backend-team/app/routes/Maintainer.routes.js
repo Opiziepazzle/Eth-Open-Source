@@ -10,53 +10,6 @@ const {  maintainerValidationRules, validate } = require('../utils/Validator.uti
 
 
 //Maintainer Onboarding
-
-// router.post('/update-maintainer', checkAuth, maintainerValidationRules(), validate,  (req, res) => {
-   
-//     // Extract user ID and termsAccepted from the request
-//     const maintainerId = req.user._id; // Assuming user info is attached to req.user after authentication
-//     const { termsAccepted } = req.body;
-
-//     // Check if the user is already registered as a maintainer
-//     maintainerSchema
-//       .findOne({ maintainerId })
-//       .then((existingMaintainer) => {
-//         if (existingMaintainer) {
-//           return res.status(400).json({
-//             success: false,
-//             message: 'User is already registered as a maintainer',
-//           });
-//         }
-
-//         // Create a new maintainer
-//         const newMaintainer = new maintainerSchema({
-//           maintainerId,
-//           termsAccepted,
-//           termsAcceptedAt: new Date(),
-//         });
-
-//         // Save the maintainer to the database
-//         return newMaintainer.save();
-//       })
-//       .then((savedMaintainer) => {
-//         res.status(201).json({
-//           success: true,
-//           message: 'Maintainer registered successfully',
-//           data: savedMaintainer,
-//         });
-//       })
-//       .catch((err) => {
-//         res.status(500).json({
-//           success: false,
-//           message: 'Error registering maintainer',
-//           error: err.message,
-//         });
-//       });
-//   }
-// );
-
-
-
 router.patch('/update-maintainer', checkAuth, maintainerValidationRules(), validate, (req, res) => {
   const {
     firstName,
@@ -126,7 +79,23 @@ router.patch('/update-maintainer', checkAuth, maintainerValidationRules(), valid
     });
 });
 
+// GET /api/maintainers - Fetch all maintainers
+router.get('/all-maintainers', async (req, res) => {
+  try {
+    // Query to fetch all contributors
+    const maintainers = await maintainerSchema.find({}, 'firstName lastName email');
+    
+    if (!maintainers.length) {
+      return res.status(404).json({ message: 'No maintainers found' });
+    }
 
+    // Respond with maintainers
+    res.status(200).json({ maintainers });
+  } catch (error) {
+    console.error('Error fetching maintainers:', error);
+    res.status(500).json({ error: 'An error occurred while fetching maintainers' });
+  }
+});
 
 
 

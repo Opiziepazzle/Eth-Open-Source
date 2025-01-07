@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
+
+    githubId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
     email: {
       type: String,
       unique: true,
@@ -55,19 +62,14 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
 
-    googleId: { type: String, unique: true, sparse: true },
+    googleId: { type: String, unique: true },
 
     displayName: { type: String},
     firstName: String,
     lastName: String,
     image: String,
 
-    githubId: {
-      type: String,
-      unique: true,
-      sparse: true,
-    },
-
+    
     accessToken: String, // To store the GitHub access token
     provider: {
       type: String,
@@ -81,9 +83,5 @@ const userSchema = new mongoose.Schema(
 
 
 
-// // Virtual field to expose `id` instead of `_id`
-// userSchema.virtual('id').get(function() {
-//   return this._id.toString(); // Convert _id to a string
-// });
 
 module.exports = mongoose.model('User', userSchema);

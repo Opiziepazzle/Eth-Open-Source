@@ -18,6 +18,7 @@ const passport = require('passport');
 const ErrorHandler = require('./app/middleware/ErrorHandler.middleware');
 
 const session = require('express-session');
+//const MongoStore = require('connect-mongo') //(session);
 
  require('./app/database/Mongo.database')
  require('dotenv').config();
@@ -29,10 +30,12 @@ require('./app/config/passport');        //(passport);
  app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // If using HTTPS, set `secure: true`
-  }));
+  saveUninitialized: true,
   
+}));
+ 
+
+
   app.use(passport.initialize());
   app.use(passport.session());
 

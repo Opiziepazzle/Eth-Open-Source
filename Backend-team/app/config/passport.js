@@ -63,81 +63,57 @@ passport.use(
 
 //Github Strategy
 
+// Use environment variable to check the environment
+const callbackURL = process.env.NODE_ENV === 'production'
+    ? 'https://ethopensource.onrender.com/auth/github/callback'
+    : 'http://localhost:3000/auth/github/callback';
+
 passport.use(
   new GitHubStrategy(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: 'https://ethopensource.onrender.com/auth/github/callback',
+      callbackURL: 'https://ethopensource.onrender.com/auth/github/callback', // Replace with appropriate environment-based URL
       scope: ['user:email'],
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
         console.log('Access Token:', accessToken);
         console.log('Profile:', profile);
-        
-        // Ensure profile.emails is fetched and available
-        if (profile.emails && profile.emails.length > 0) {
-          const email = profile.emails[0].value;
-          console.log('GitHub Email:', email);  // Log the email to ensure it's fetched correctly
 
-          let user = await userSchema.findOne({ githubId: profile.id });
-  
-          if (user) {
-            // If user exists, update the email if it's missing
-            if (!user.email) {
-              user.email = email; // Add email if it's missing
-              await user.save();
-            }
-            return done(null, { ...user.toObject(), accessToken });
-          }
+        if (!profile.emails || profile.emails.length === 0) {
+          return done(new Error('No email found in GitHub profile'), null);
+        }
 
-          // If no user found by githubId, check for the email
+        const email = profile.emails[0].value;
+        console.log('GitHub Email:', email);
+
+        let user = await userSchema.findOne({ githubId: profile.id });
+
+        if (!user) {
           user = await userSchema.findOne({ email: email });
-
           if (user) {
             user.githubId = profile.id;
             await user.save();
-            return done(null, { ...user.toObject(), accessToken });
+          } else {
+            user = new userSchema({
+              githubId: profile.id,
+              displayName: profile.displayName || profile.username || 'No Name',
+              avatar: profile._json.avatar_url,
+              email: email,
+            });
+            await user.save();
           }
-  
-          // If no existing user, create a new one
-          const newUser = new userSchema({
-            githubId: profile.id,
-            displayName: profile.displayName || profile.username || 'No Name',
-            avatar: profile._json.avatar_url,
-            email: email, 
-          });
-  
-          const savedUser = await newUser.save();
-          return done(null, { ...savedUser.toObject(), accessToken });
-        } else {
-          return done(new Error('No email found in GitHub profile'), null);
         }
+
+        return done(null, { ...user.toObject(), accessToken });
       } catch (err) {
+        console.error('Error in GitHub Strategy:', err);
         return done(err, null);
       }
     }
   )
 );
-
-
-passport.serializeUser((user, done) => {
-  done(null, { id: user.githubId, accessToken: user.accessToken });
-});
-
-passport.deserializeUser(async (userData, done) => {
-  try {
-    const user = await userSchema.findOne({ githubId: userData.id });
-    if (!user) {
-      return done(new Error('User not found during deserialization'));
-    }
-    done(null, { ...user.toObject(), accessToken: userData.accessToken });
-  } catch (err) {
-    done(err, null);
-  }
-});
-
 
 
 

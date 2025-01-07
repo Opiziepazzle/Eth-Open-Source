@@ -8,7 +8,6 @@ const projectSchema = require('../models/project.model');
 
 
 
-
 const storage = multer.diskStorage({
   
   destination: function(req, file, cb ){
@@ -38,34 +37,43 @@ fileFilter: fileFilter })
 
 
 
-// Create a project
-router.post('/create-project', checkAuth,   upload.single('projectImage'), (req, res) => {
 
 
+
+router.post('/create-project', checkAuth, upload.single('projectImage'), (req, res) => {
   const { title, description, type, rewards, 
     experienceLevel, skillsRequired, projectLeads,
     skillsCategory, longDescription, userLinks } = req.body;
 
+  // Check if file upload is successful
   const projectImage = req.file ? req.file.path : undefined;
+  
+  // Get maintainer's ID from the user object attached by checkSess middleware
+  const maintainerId = req.user ? req.user.id : null;  // Ensure req.user exists
 
- // Validate required fields
- if (!title || !description || !type) {
-  return res.status(400).json({ error: 'Title, description, and type are required fields.' });
- }
+  // Validate required fields
+  if (!title || !description || !type) {
+    return res.status(400).json({ error: 'Title, description, and type are required fields.' });
+  }
+
+  if (!maintainerId) {
+    return res.status(400).json({ error: 'User not authenticated or maintainer ID is missing' });
+  }
+
+  // Create new project
   projectSchema.create({
     title,
     description,
-    maintainer: req.user.id, // Assuming req.user contains authenticated maintainer's ID
+    maintainer: maintainerId,
     type,
     rewards,
     experienceLevel,
     skillsRequired,
     projectImage,
     projectLeads,
-    skillsCategory, 
+    skillsCategory,
     userLinks,
     longDescription,
-    
   })
     .then((project) => res.status(201).json(project))
     .catch((err) => res.status(500).json({ error: err.message }));

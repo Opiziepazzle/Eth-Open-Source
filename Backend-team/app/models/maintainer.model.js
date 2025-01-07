@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const maintainerSchema = new mongoose.Schema({
     maintainerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Link to the user
+    githubId: { type: String, unique: true },
     firstName: { type: String },
     lastName: { type: String },
     phoneNumber: { type: String, required: true, unique: true },

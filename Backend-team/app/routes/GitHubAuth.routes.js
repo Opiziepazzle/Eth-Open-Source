@@ -7,127 +7,57 @@ const contributorSchema = require('../models/contributor.model');
 const maintainerSchema = require('../models/maintainer.model');
 const checkAuth = require('../middleware/App.middleware')
 const router = express.Router();
+require('dotenv').config();
 
 // GitHub Login Endpoint
 router.get('/', passport.authenticate('github', { scope: ['user:email', 'repo', 'issues'] }));
 
 
 
-
-// router.get(
-//   '/callback',
-//   passport.authenticate('github', { session: false }),
-//   async (req, res) => {
-//     try {
-//       const userId = req.user._id; // Authenticated user ID
-//       const accessToken = req.user.accessToken; // GitHub access token
-
-//       // Fetch user repositories from GitHub
-//       const response = await axios.get('https://api.github.com/user/repos', {
-//         headers: { Authorization: `Bearer ${accessToken}` },
-//       });
-
-//       const repos = response.data;
-
-//       // Check if user exists in the database
-//       let user = await userSchema.findById(userId);
-
-//       if (!user) {
-//         // New user: Create and redirect to onboarding
-//         user = new userSchema({
-//           githubId: req.user.githubId,
-//           repos, // Save fetched repos
-//         });
-
-//         await user.save();
-
-//         const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY, { expiresIn: '1h' });
-
-//         // Redirect to onboarding for role selection
-//         const onboardingURL = `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
-//         return res.redirect(onboardingURL);
-//       }
-
-//       // Existing user: Check role
-//       const contributor = await contributorSchema.findOne({ contributorId: user._id });
-//       const maintainer = await maintainerSchema.findOne({ maintainerId: user._id });
-
-//       const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
-
-//       // Generate token with role for existing users
-//       const token = jwt.sign({ userId: user._id, role }, process.env.JWT_KEY, { expiresIn: '1h' });
-
-//       // Redirect to appropriate dashboard or onboarding
-//       const redirectURL =
-//         role === 'maintainer'
-//           ? `http://localhost:5173/maintainer-dashboard?token=${encodeURIComponent(token)}`
-//           : role === 'contributor'
-//           ? `http://localhost:5173/contributor-dashboard?token=${encodeURIComponent(token)}`
-//           : `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
-
-//       return res.redirect(redirectURL);
-//     } catch (err) {
-//       console.error('Error during authentication:', err);
-//       res.status(500).json({ error: 'Authentication failed' });
-//     }
-//   }
-// );
-
 router.get(
   '/callback',
   passport.authenticate('github', { session: false }),
   async (req, res) => {
     try {
-      const githubId = req.user.id; // GitHub ID, this is the unique identifier
-      const accessToken = req.user.accessToken; // GitHub access token
+      console.log('Authenticated User:', req.user);
 
-      // Fetch user repositories from GitHub
+      const { githubId, accessToken } = req.user;
       const response = await axios.get('https://api.github.com/user/repos', {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       const repos = response.data;
-
-      // Check if user exists in the database
-      let user = await userSchema.findOne({ githubId: githubId });
+      let user = await userSchema.findOne({ githubId });
 
       if (!user) {
-        // New user: Create and redirect to onboarding
+        const email = req.user.email; // Ensure email is fetched from req.user
         user = new userSchema({
-          githubId, // Use GitHub ID
-          repos, // Save fetched repos
+          githubId,
+          email,
+          displayName: req.user.displayName,
+          avatar: req.user.avatar,
+          repos,
         });
 
         await user.save();
-
-        // Sign the token with githubId
-        const token = jwt.sign({ userId: user.githubId }, process.env.JWT_KEY, { expiresIn: '1h' });
-
-        // Redirect to onboarding for role selection
-        const onboardingURL = `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
-        return res.redirect(onboardingURL);
       }
 
-      // Existing user: Check role
       const contributor = await contributorSchema.findOne({ contributorId: user._id });
       const maintainer = await maintainerSchema.findOne({ maintainerId: user._id });
 
       const role = contributor ? 'contributor' : maintainer ? 'maintainer' : 'none';
 
-      // Generate token with role for existing users
-      const token = jwt.sign({ userId: user.githubId, role }, process.env.JWT_KEY, { expiresIn: '1h' });
-
-      // Redirect to appropriate dashboard or onboarding
+      const token = jwt.sign({ userId: user._id, role }, process.env.JWT_KEY, { expiresIn: '4d' });
       const redirectURL =
         role === 'maintainer'
-          ? `http://localhost:5173/maintainer-dashboard?token=${encodeURIComponent(token)}`
+          ? `http://localhost:5173/maintainer-dashboard?token=${token}`
           : role === 'contributor'
-          ? `http://localhost:5173/contributor-dashboard?token=${encodeURIComponent(token)}`
-          : `http://localhost:5173/onboarding?token=${encodeURIComponent(token)}`;
+          ? `http://localhost:5173/contributor-dashboard?token=${token}`
+          : `http://localhost:5173/onboarding?token=${token}`;
 
       return res.redirect(redirectURL);
     } catch (err) {
-      console.error('Error during authentication:', err);
+      console.error('Error during callback:', err);
       res.status(500).json({ error: 'Authentication failed' });
     }
   }
@@ -135,36 +65,23 @@ router.get(
 
 
 
-
-// Route to fetch GitHub user info (email, displayName, avatar)
+//Route to fetch GitHub user info (email, displayName, avatar)
 router.get('/user-info', checkAuth, async (req, res) => {
   try {
-    // Find the user by GitHub ID (assuming it's stored in `githubId`)
     const user = await userSchema.findOne({ githubId: req.user.githubId });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Send back the required user information
-   // const { email, displayName, avatar } = user;
-   const { email, displayName = 'No Name', avatar = '' } = user;
-
-    // if (!displayName || !avatar) {
-    //   return res.status(200).json({ message: 'User info incomplete. Please complete your profile.' });
-    // }
-    // if (!user.displayName) {
-    //   user.displayName = profile.displayName || profile.username || 'No Name';  // Ensure displayName is set
-    // }
-    // if (!user.avatar) {
-    //   user.avatar = profile._json.avatar_url || '';  // Ensure avatar is set
-    // }
-    
+    const { email, displayName = 'No Name', avatar = '' } = user;
     return res.status(200).json({ email, displayName, avatar });
   } catch (err) {
+    console.error('Error fetching user info:', err);
     return res.status(500).json({ error: err.message });
   }
 });
+
 
 // Fetch Issues for a Repository
 router.get('/issues/:owner/:repo', async (req, res) => {
@@ -281,10 +198,3 @@ router.get('/logout', (req, res) => {
 
 
 module.exports = router;
-
-
-
-
-
-
-
