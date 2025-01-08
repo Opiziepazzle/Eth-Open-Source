@@ -29,10 +29,6 @@ const loginValidationRules = () => {
 
 const contributorValidationRules = () => {
     return [
-        // Contributor ID validation (e.g., check if it exists and is a valid format)
-        check('contributorId')
-            .notEmpty().withMessage('Contributor ID is required')
-            .isAlphanumeric().withMessage('Contributor ID must be alphanumeric'),
 
         // First Name validation
         check('firstName')
@@ -104,11 +100,7 @@ const contributorValidationRules = () => {
 
 const maintainerValidationRules = () => {
     return [
-      // Maintainer ID validation
-      check('maintainerId')
-        .notEmpty().withMessage('Maintainer ID is required')
-        .isAlphanumeric().withMessage('Maintainer ID must be alphanumeric'),
-  
+      
         // First Name validation
         check('firstName')
             .trim()
@@ -147,8 +139,8 @@ const maintainerValidationRules = () => {
             // Biography validation (Optional but recommended for length)
         check('typeOfContributor')
         .trim()
-        .optional()
-        .isLength({ max: 1000 }).withMessage('Biography should not exceed 1000 characters'),
+        .optional(),
+        
     
            // Terms Accepted validation (Required and must be true)
            check('termsAccepted')
