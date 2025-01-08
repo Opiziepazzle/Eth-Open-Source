@@ -7,7 +7,7 @@ const maintainerSchema = new mongoose.Schema({
     phoneNumber: { type: String, required: true},
     location:   [{ type: String, required: true }],
     biography: { type: String, maxlength: 1000 },
-    portfolioLink:  { type: String, match: /^https?:\/\/[\w.-]+\.[a-z]{2,}/i },
+    portfolioLink:  [{ type: String, match: /^(https?:\/\/|www\.)[\w.-]+\.[a-z]{2,}(\/[^\s]*)?$/i, required: true }],
     typeOfContributor:  { type: String, maxlength: 1000 },
     termsAccepted: { type: Boolean, required: true },
     termsAcceptedAt: { type: Date }

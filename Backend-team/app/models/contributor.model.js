@@ -2,13 +2,12 @@ const mongoose = require('mongoose');
 
 const contributorSchema = new mongoose.Schema({
     contributorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Link to the user
-    email: { type: String, unique: true,},
     firstName: { type: String },
     lastName: { type: String },
     phoneNumber: { type: String, required: true,  },
     location:   [{ type: String, required: true }],
     biography: { type: String, maxlength: 1000 },
-    portfolioLink:  { type: String, match: /^https?:\/\/[\w.-]+\.[a-z]{2,}/i },
+    portfolioLink:  [{ type: String, match: /^(https?:\/\/|www\.)[\w.-]+\.[a-z]{2,}(\/[^\s]*)?$/i, required: true }],
     identify: { type: String, enum: ['Tech Bro', 'Non Tech Bro'], required: true },
     preferredSkills:  [{ type: String, required: true }],
      goals:  [{ type: String, required: true }],

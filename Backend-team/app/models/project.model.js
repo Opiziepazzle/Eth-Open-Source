@@ -20,7 +20,7 @@ const projectSchema = new mongoose.Schema({
 
   skillsCategory:  [{ type: String, required: true }], 
   longDescription: { type: String, maxlength: 2000 },
-  userLinks: [{ type: String, match: /^https?:\/\/[\w.-]+\.[a-z]{2,}/i  }],
+  userLinks: [{ type: String, match: /^(https?:\/\/|www\.)[\w.-]+\.[a-z]{2,}(\/[^\s]*)?$/i, required: true }],
   
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
