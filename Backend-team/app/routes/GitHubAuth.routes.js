@@ -48,7 +48,7 @@ router.get(
       }
 
       
-      const contributor = await contributorSchema.findOne({ _id: user._id  });
+      const contributor = await contributorSchema.findOne({ _id: user._id });
       const maintainer = await maintainerSchema.findOne({ _id: user._id });
 
       console.log('Contributor:', contributor);
