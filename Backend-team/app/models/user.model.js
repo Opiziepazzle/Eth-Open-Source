@@ -31,10 +31,8 @@ const userSchema = new mongoose.Schema(
      sparse: true 
      },
 
-    avatar: {
-      type: String,
-    },
-
+     avatar: { type: String },
+     
     identity: {
       type: String,
       enum: ['Tech Bro', 'Non-Tech Bro'], // Field for tech identity

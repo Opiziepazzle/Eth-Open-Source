@@ -13,8 +13,7 @@ const { contributorValidationRules, validate } = require('../utils/Validator.uti
 
 
 
-
-router.patch('/update-contributor', checkAuth, contributorValidationRules(), validate, (req, res) => {
+router.post('/update-contributor', checkAuth, contributorValidationRules(), validate, (req, res) => {
   const {
     firstName,
     lastName,
@@ -89,11 +88,19 @@ router.patch('/update-contributor', checkAuth, contributorValidationRules(), val
 });
 
 
+
+
+
+
+
+
+
+
 // GET /api/contributors - Fetch all contributors
 router.get('/all-contributors', async (req, res) => {
   try {
     // Query to fetch all contributors
-    const contributors = await contributorSchema.find({}, 'firstName lastName email');
+    const contributors = await contributorSchema.find({}, 'firstName lastName');
     
     if (!contributors.length) {
       return res.status(404).json({ message: 'No contributors found' });
@@ -106,6 +113,8 @@ router.get('/all-contributors', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching contributors' });
   }
 });
+
+
 
 
 //  Filter and search for contributors (pagination)
@@ -365,5 +374,85 @@ router.get('/all-contributors', async (req, res) => {
 
 
 
+
+
+
+
+
+
+//Create and Update Contributor with patch
+// router.patch('/update-contributor', checkAuth, contributorValidationRules(), validate, (req, res) => {
+//   const {
+//     firstName,
+//     lastName,
+//     phoneNumber,
+//     location,
+//     biography,
+//     portfolioLink,
+//     identify,
+//     preferredSkills,
+//     goals,
+//     proficiencyLevel,
+//     termsAccepted,
+//   } = req.body;
+
+//   const contributorId = req.user._id;
+
+//   // Check if contributorId is a valid ObjectId
+//   if (!mongoose.Types.ObjectId.isValid(contributorId)) {
+//     return res.status(400).json({
+//       success: false,
+//       message: 'Invalid contributorId format',
+//     });
+//   }
+
+//   // Validate required fields
+//   if (!firstName || !lastName || !location || !identify || !termsAccepted) {
+//     return res.status(400).json({
+//       success: false,
+//       message: 'Missing required fields: firstName, lastName, location, identify, termsAccepted',
+//     });
+//   }
+
+//   // Prepare update data
+//   const updateData = {
+//     firstName,
+//     lastName,
+//     phoneNumber,
+//     location,
+//     biography,
+//     portfolioLink,
+//     identify,
+//     termsAccepted,
+//     termsAcceptedAt: new Date(),
+//     preferredSkills,
+//     goals,
+//     proficiencyLevel,
+//   };
+
+//   // Use upsert to create or update contributor
+//   contributorSchema.findOneAndUpdate(
+//     { _id: contributorId },
+//     { $set: updateData },
+//     { new: true, upsert: true, runValidators: true }
+//   )
+//     .then((updatedContributor) => {
+//       res.status(200).json({
+//         success: true,
+//         message: updatedContributor.isNew
+//           ? 'Contributor created successfully'
+//           : 'Contributor updated successfully',
+//         data: updatedContributor,
+//       });
+//     })
+//     .catch((err) => {
+//       console.error('Error during upsert operation:', err);
+//       res.status(400).json({
+//         success: false,
+//         message: 'Error updating or creating contributor',
+//         error: err.message,
+//       });
+//     });
+// });
   
 module.exports = router;

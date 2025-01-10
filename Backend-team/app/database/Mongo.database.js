@@ -7,8 +7,8 @@ mongoose.set('strictQuery', false)
 
 
 mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
     serverSelectionTimeoutMS: 20000, // 20 seconds
 },
     ).then((data)=>{

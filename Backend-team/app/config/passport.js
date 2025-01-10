@@ -64,16 +64,17 @@ passport.use(
 //Github Strategy
 
 // Use environment variable to check the environment
-const callbackURL = process.env.NODE_ENV === 'production'
-    ? 'https://ethopensource.onrender.com/auth/github/callback'
-    : 'http://localhost:3000/auth/github/callback';
+// const callbackURL = process.env.NODE_ENV === 'production'
+//     ? 'https://ethopensource.onrender.com/auth/github/callback'
+//     : 'http://localhost:3000/auth/github/callback';
+
 
 passport.use(
   new GitHubStrategy(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: 'https://ethopensource.onrender.com/auth/github/callback', // Replace with appropriate environment-based URL
+      callbackURL: 'https://ethopensource.onrender.com/auth/github/callback',
       scope: ['user:email'],
     },
     async function (accessToken, refreshToken, profile, done) {
@@ -99,7 +100,7 @@ passport.use(
             user = new userSchema({
               githubId: profile.id,
               displayName: profile.displayName || profile.username || 'No Name',
-              avatar: profile._json.avatar_url,
+              avatar: profile._json?.avatar_url || 'https://example.com/default-avatar.png', // Updated with safe check
               email: email,
             });
             await user.save();
@@ -114,7 +115,6 @@ passport.use(
     }
   )
 );
-
 
 
 module.exports = passport;
